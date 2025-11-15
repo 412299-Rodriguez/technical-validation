@@ -51,7 +51,13 @@ public class PersonMapper {
         applyRequest(entity, request);
         List<PersonAdditionalAttributeEntity> attributes = toAdditionalAttributeEntities(
                 request.getAdditionalAttributes(), entity);
-        entity.setAdditionalAttributes(attributes);
+        List<PersonAdditionalAttributeEntity> currentAttributes = entity.getAdditionalAttributes();
+        if (currentAttributes == null) {
+            entity.setAdditionalAttributes(attributes);
+        } else {
+            currentAttributes.clear();
+            currentAttributes.addAll(attributes);
+        }
     }
 
     /**
@@ -131,7 +137,8 @@ public class PersonMapper {
             final AdditionalAttributeDto dto,
             final PersonEntity owner) {
         PersonAdditionalAttributeEntity entity = new PersonAdditionalAttributeEntity();
-        entity.setId(dto.getId());
+        // IDs are always generated; forcing them to null avoids detached entity errors
+        entity.setId(null);
         entity.setAttrKey(dto.getKey());
         entity.setAttrValue(dto.getValue());
         entity.setPerson(owner);

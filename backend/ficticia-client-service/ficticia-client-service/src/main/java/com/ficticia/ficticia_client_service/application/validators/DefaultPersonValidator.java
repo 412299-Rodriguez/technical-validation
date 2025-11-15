@@ -73,6 +73,9 @@ public class DefaultPersonValidator implements PersonValidator {
             if (!normalizedKeys.add(key)) {
                 throw new BusinessException("Additional attribute keys must be unique");
             }
+            if (attribute.getValue() == null || attribute.getValue().isBlank()) {
+                throw new BusinessException("Additional attribute value must not be blank");
+            }
         }
     }
 }
