@@ -1,4 +1,4 @@
-﻿package com.ficticia.ficticia_client_service.application.services;
+package com.ficticia.ficticia_client_service.application.services;
 
 import com.ficticia.ficticia_client_service.api.dtos.LoginRequest;
 import com.ficticia.ficticia_client_service.api.dtos.LoginResponse;

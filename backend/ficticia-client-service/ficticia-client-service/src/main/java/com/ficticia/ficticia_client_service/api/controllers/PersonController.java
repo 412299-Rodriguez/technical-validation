@@ -1,4 +1,4 @@
-﻿package com.ficticia.ficticia_client_service.api.controllers;
+package com.ficticia.ficticia_client_service.api.controllers;
 
 import java.net.URI;
 import java.util.List;

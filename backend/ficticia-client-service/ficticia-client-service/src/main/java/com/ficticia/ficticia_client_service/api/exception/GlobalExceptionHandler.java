@@ -1,4 +1,4 @@
-﻿package com.ficticia.ficticia_client_service.api.exception;
+package com.ficticia.ficticia_client_service.api.exception;
 
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-﻿package com.ficticia.ficticia_client_service.application.services.impl;
+package com.ficticia.ficticia_client_service.application.services.impl;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,4 +1,4 @@
-﻿package com.ficticia.ficticia_client_service.application.validators;
+package com.ficticia.ficticia_client_service.application.validators;
 
 import com.ficticia.ficticia_client_service.api.dtos.PersonRequest;
 

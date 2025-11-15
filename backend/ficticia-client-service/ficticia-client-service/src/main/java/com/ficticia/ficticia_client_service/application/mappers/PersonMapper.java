@@ -1,4 +1,4 @@
-﻿package com.ficticia.ficticia_client_service.application.mappers;
+package com.ficticia.ficticia_client_service.application.mappers;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-﻿package com.ficticia.ficticia_client_service.infrastructure.repositories;
+package com.ficticia.ficticia_client_service.infrastructure.repositories;
 
 import java.util.List;
 

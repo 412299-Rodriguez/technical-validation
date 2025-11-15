@@ -1,4 +1,4 @@
-﻿package com.ficticia.ficticia_client_service.api.controllers;
+package com.ficticia.ficticia_client_service.api.controllers;
 
 import java.util.Collections;
 import java.util.Map;

@@ -1,4 +1,4 @@
-﻿package com.ficticia.ficticia_client_service.infrastructure.configs;
+package com.ficticia.ficticia_client_service.infrastructure.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

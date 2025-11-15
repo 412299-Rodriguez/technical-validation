@@ -1,4 +1,4 @@
-﻿package com.ficticia.ficticia_client_service.application.validators;
+package com.ficticia.ficticia_client_service.application.validators;
 
 import java.util.HashSet;
 import java.util.List;

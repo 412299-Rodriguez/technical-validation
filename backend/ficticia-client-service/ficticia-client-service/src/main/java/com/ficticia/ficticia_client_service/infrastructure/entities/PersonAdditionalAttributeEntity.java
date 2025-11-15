@@ -1,4 +1,4 @@
-﻿package com.ficticia.ficticia_client_service.infrastructure.entities;
+package com.ficticia.ficticia_client_service.infrastructure.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

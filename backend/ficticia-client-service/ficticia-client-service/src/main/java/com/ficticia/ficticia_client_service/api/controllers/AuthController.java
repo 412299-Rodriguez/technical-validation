@@ -1,4 +1,4 @@
-﻿package com.ficticia.ficticia_client_service.api.controllers;
+package com.ficticia.ficticia_client_service.api.controllers;
 
 import com.ficticia.ficticia_client_service.api.dtos.ErrorResponse;
 import com.ficticia.ficticia_client_service.api.dtos.LoginRequest;
