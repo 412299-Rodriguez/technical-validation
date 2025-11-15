@@ -1,0 +1,9 @@
+<nav class="navbar">
+  <a class="navbar__logo" routerLink="/">Ficticia</a>
+  <ul class="navbar__links">
+    <li *ngFor="let link of links">
+      <a routerLink="{{ link.path }}" routerLinkActive="active">{{ link.label }}</a>
+    </li>
+  </ul>
+  <a class="navbar__auth" routerLink="/auth/login">Cerrar sesión</a>
+</nav>
