@@ -1,0 +1,58 @@
+﻿package com.ficticia.ficticia_client_service.api.dtos;
+
+import jakarta.validation.constraints.NotBlank;
+
+/**
+ * Represents the credentials used for authentication requests.
+ */
+public class LoginRequest {
+
+    @NotBlank
+    private String username;
+
+    @NotBlank
+    private String password;
+
+    /**
+     * Creates an empty {@link LoginRequest}.
+     */
+    public LoginRequest() {
+        // Default constructor for serialization frameworks.
+    }
+
+    /**
+     * Retrieves the username.
+     *
+     * @return username value
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Sets the username.
+     *
+     * @param username username value
+     */
+    public void setUsername(final String username) {
+        this.username = username;
+    }
+
+    /**
+     * Retrieves the password.
+     *
+     * @return password value
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Sets the password.
+     *
+     * @param password password value
+     */
+    public void setPassword(final String password) {
+        this.password = password;
+    }
+}
