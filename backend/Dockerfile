@@ -3,8 +3,9 @@
 # Build stage
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
-COPY pom.xml .
-COPY src ./src
+# Copiamos el proyecto real ubicado dentro de ficticia-client-service/ficticia-client-service
+COPY ficticia-client-service/ficticia-client-service/pom.xml ./pom.xml
+COPY ficticia-client-service/ficticia-client-service/src ./src
 RUN mvn -B clean package -DskipTests
 
 # Run stage

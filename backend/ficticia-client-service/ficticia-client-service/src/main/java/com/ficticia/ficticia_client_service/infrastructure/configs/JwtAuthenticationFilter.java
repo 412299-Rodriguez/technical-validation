@@ -15,12 +15,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Filter responsible for validating JWT tokens on every request.
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -32,15 +34,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     final FilterChain filterChain)
             throws ServletException, IOException {
         String token = resolveToken(request);
-        if (token != null && jwtTokenProvider.validateToken(token)
+        if (token != null) {
+            log.info("JWT detected for request {} {}", request.getMethod(), request.getRequestURI());
+        }
+        if (token != null
+                && jwtTokenProvider.validateToken(token)
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
             String username = jwtTokenProvider.getUsernameFromToken(token);
+            log.info("Token valid for user {}", username);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
             authentication.setDetails(userDetails);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+        } else if (token != null) {
+            log.warn("Token was invalid or authentication already present");
         }
         filterChain.doFilter(request, response);
     }
