@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: ficticia-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ficticia_insurance
+      MYSQL_USER: ficticia
+      MYSQL_PASSWORD: ficticia
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./backend        # carpeta donde está el pom.xml y el Dockerfile
+      dockerfile: Dockerfile
+    container_name: ficticia-backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_NAME: ficticia_insurance
+      DB_USER: ficticia
+      DB_PASSWORD: ficticia
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend/ficticia-person-client
+      dockerfile: Dockerfile
+    container_name: ficticia-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"
+
+volumes:
+  db_data:
