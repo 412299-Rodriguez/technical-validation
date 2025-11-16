@@ -47,6 +47,23 @@ interface AgeDistributionBucket {
   color: string;
 }
 
+/**
+ * Bucket describing how many clients fall into each activity status.
+ */
+interface UserStatusBucket {
+  label: string;
+  value: number;
+}
+
+/**
+ * Represents the split between clients who have a condition and those who do not.
+ */
+interface ConditionComparisonBucket {
+  label: string;
+  yes: number;
+  no: number;
+}
+
 @Component({
   standalone: true,
   selector: 'app-home-page',
@@ -59,11 +76,19 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
   @ViewChild('pieChartCanvas') pieChartCanvas?: ElementRef<HTMLCanvasElement>;
   /** Canvas reference for the bar chart instance. */
   @ViewChild('barChartCanvas') barChartCanvas?: ElementRef<HTMLCanvasElement>;
+  /** Canvas reference for the user status chart. */
+  @ViewChild('userStatusChartCanvas') userStatusChartCanvas?: ElementRef<HTMLCanvasElement>;
+  /** Canvas reference for the condition comparison chart. */
+  @ViewChild('comparisonChartCanvas') comparisonChartCanvas?: ElementRef<HTMLCanvasElement>;
 
   /** Chart.js pie chart reference so it can be destroyed. */
   private pieChart?: any;
   /** Chart.js bar chart reference so it can be destroyed. */
   private barChart?: any;
+  /** Chart.js instance for the user status chart. */
+  private userStatusChart?: any;
+  /** Chart.js instance for the yes vs no comparison chart. */
+  private comparisonChart?: any;
 
   /** Branding shared with the sidebar and navbar components. */
   readonly sidebarBranding: CompanyBranding = DEFAULT_COMPANY_BRANDING;
@@ -110,6 +135,20 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
     { label: '31-40', value: 2, color: '#3b82f6' },
     { label: '41-50', value: 1, color: '#2563eb' },
     { label: '51-60', value: 1, color: '#1d4ed8' }
+  ];
+
+  /** Mock dataset representing how many users are active vs inactive. */
+  readonly userStatusStats: UserStatusBucket[] = [
+    { label: 'Activos', value: 8 },
+    { label: 'Inactivos', value: 2 }
+  ];
+
+  /** Comparison dataset that splits each condition between yes/no counts. */
+  readonly conditionComparison: ConditionComparisonBucket[] = [
+    { label: 'Maneja', yes: 4, no: 1 },
+    { label: 'Lentes', yes: 3, no: 2 },
+    { label: 'Diabético', yes: 1, no: 4 },
+    { label: 'Otras enf.', yes: 2, no: 3 }
   ];
 
   /** Sanitizer used to safely project SVG icons into the DOM. */
@@ -193,6 +232,8 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
           clearInterval(checkChart);
           this.initializePieChart();
           this.initializeBarChart();
+          this.initializeUserStatusChart();
+          this.initializeConditionComparisonChart();
         }
       }, 100);
     }
@@ -297,6 +338,115 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
   }
 
   /**
+   * Creates the bar chart highlighting how many users are active vs inactive.
+   */
+  private initializeUserStatusChart(): void {
+    if (!this.userStatusChartCanvas || !Chart) return;
+
+    const ctx = this.userStatusChartCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const config: any = {
+      type: 'bar',
+      data: {
+        labels: this.userStatusStats.map(bucket => bucket.label),
+        datasets: [
+          {
+            data: this.userStatusStats.map(bucket => bucket.value),
+            backgroundColor: '#facc15',
+            borderRadius: 8,
+            borderSkipped: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1 },
+            grid: {
+              display: true,
+              color: '#f1f5f9'
+            }
+          },
+          x: {
+            grid: { display: false }
+          }
+        }
+      }
+    };
+
+    this.userStatusChart = new Chart(ctx, config);
+  }
+
+  /**
+   * Creates the grouped bar chart comparing clients that have vs do not have each condition.
+   */
+  private initializeConditionComparisonChart(): void {
+    if (!this.comparisonChartCanvas || !Chart) return;
+
+    const ctx = this.comparisonChartCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const config: any = {
+      type: 'bar',
+      data: {
+        labels: this.conditionComparison.map(item => item.label),
+        datasets: [
+          {
+            label: 'No',
+            data: this.conditionComparison.map(item => item.no),
+            backgroundColor: '#ef4444',
+            borderRadius: 6,
+            borderSkipped: false,
+            barPercentage: 0.5
+          },
+          {
+            label: 'Sí',
+            data: this.conditionComparison.map(item => item.yes),
+            backgroundColor: '#22c55e',
+            borderRadius: 6,
+            borderSkipped: false,
+            barPercentage: 0.5
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { usePointStyle: true }
+          },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1 },
+            grid: {
+              display: true,
+              color: '#f1f5f9'
+            }
+          },
+          x: {
+            grid: { display: false }
+          }
+        }
+      }
+    };
+
+    this.comparisonChart = new Chart(ctx, config);
+  }
+
+  /**
    * Tear down Chart.js instances so they do not leak memory when the component is destroyed.
    */
   ngOnDestroy(): void {
@@ -305,6 +455,12 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
     }
     if (this.barChart) {
       this.barChart.destroy();
+    }
+    if (this.userStatusChart) {
+      this.userStatusChart.destroy();
+    }
+    if (this.comparisonChart) {
+      this.comparisonChart.destroy();
     }
   }
 }
