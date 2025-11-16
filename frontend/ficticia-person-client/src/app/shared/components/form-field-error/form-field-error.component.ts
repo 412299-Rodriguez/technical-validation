@@ -47,13 +47,13 @@ export class FormFieldErrorComponent {
   private resolveDefaultMessage(key: string, errors: ValidationErrors): string {
     switch (key) {
       case 'required':
-        return 'This field is required';
+        return 'El campo es obligatorio';
       case 'email':
-        return 'Please enter a valid email address';
+        return 'Ingrese un correo electrónico válido';
       case 'minlength':
-        return `Must have at least ${(errors['minlength'] as { requiredLength: number }).requiredLength} characters`;
+        return `Debe tener al menos ${(errors['minlength'] as { requiredLength: number }).requiredLength} caracteres`;
       default:
-        return 'Invalid field';
+        return 'Campo inválido';
     }
   }
 }
