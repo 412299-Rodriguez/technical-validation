@@ -1,0 +1,18 @@
+<!-- 
+  Sidebar Navigation
+  Hidden on mobile (md:flex), visible on medium+ screens
+-->
+<aside class="sidebar">
+  <!-- Navigation Links -->
+  <nav class="sidebar__nav">
+    <a
+      *ngFor="let link of links"
+      [routerLink]="link.path"
+      routerLinkActive="sidebar__link--active"
+      class="sidebar__link"
+      [class.sidebar__link--active]="link.active">
+      <span class="sidebar__link-icon" [innerHTML]="link.icon"></span>
+      <span class="sidebar__link-label">{{ link.label }}</span>
+    </a>
+  </nav>
+</aside>

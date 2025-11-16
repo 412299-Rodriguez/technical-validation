@@ -1,0 +1,77 @@
+<!-- 
+  Home Dashboard Layout
+  
+  Structure:
+  - Content Area:
+    - Sidebar: Left navigation (component)
+    - Main: Dashboard content
+-->
+
+<div class="dashboard-layout">
+  <!-- Content Area: Sidebar + Main Content -->
+  <div class="dashboard-layout__content">
+    <!-- Sidebar Component -->
+    <app-sidebar
+      [branding]="sidebarBranding"
+      [links]="sidebarLinks">
+    </app-sidebar>
+
+    <!-- Main Dashboard Content -->
+    <main class="dashboard-layout__main">
+      <!-- Dashboard Title Section -->
+      <section class="dashboard-section">
+        <h1 class="dashboard-title">Dashboard</h1>
+        <p class="dashboard-subtitle">Vista general de métricas de clientes</p>
+      </section>
+
+      <!-- Metrics Cards Grid -->
+      <section class="metrics-grid">
+        <article *ngFor="let metric of metrics" class="metric-card">
+          <div class="metric-card__header">
+            <span class="metric-card__label">{{ metric.label }}</span>
+            <span 
+              class="metric-card__badge" 
+              [ngClass]="metric.accentColorClass" 
+              [innerHTML]="metric.safeIconSvg">
+            </span>
+          </div>
+          <p class="metric-card__value">{{ metric.value }}</p>
+          <p class="metric-card__subtitle">{{ metric.subtitle }}</p>
+        </article>
+      </section>
+
+      <!-- Charts Section -->
+      <section class="charts-grid">
+        <!-- Pie Chart Card -->
+        <article class="chart-card">
+          <h2 class="chart-card__title">Distribución de Factores de Salud</h2>
+          <p class="chart-card__subtitle">Número de clientes por categoría</p>
+          
+          <div class="pie-chart-container">
+            <div class="pie-chart-canvas">
+              <canvas #pieChartCanvas></canvas>
+            </div>
+            
+            <ul class="chart-legend">
+              <li *ngFor="let slice of healthFactorSlices" class="chart-legend__item">
+                <span class="chart-legend__color" [style.backgroundColor]="slice.color"></span>
+                <span class="chart-legend__label">{{ slice.label }}</span>
+                <span class="chart-legend__value">{{ slice.value }}</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Bar Chart Card -->
+        <article class="chart-card">
+          <h2 class="chart-card__title">Distribución por Edad</h2>
+          <p class="chart-card__subtitle">Número de clientes por rango de edad</p>
+          
+          <div class="bar-chart-container">
+            <canvas #barChartCanvas></canvas>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+</div>

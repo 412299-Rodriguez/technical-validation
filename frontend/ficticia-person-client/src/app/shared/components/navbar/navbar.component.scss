@@ -1,35 +1,185 @@
+/**
+ * Navbar Component Styles
+ * Clean white navbar with user menu on the right
+ */
+
 .navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 2rem;
-  background-color: #0f172a;
-  color: #fff;
+  padding: 1rem 2.5rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
+  &__left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__brand-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.9rem;
+    background-color: #3b82f6;
+    color: #ffffff;
+    flex-shrink: 0;
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  &__brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  &__brand-name {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  &__brand-subtitle {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+
+  &__user-menu {
+    position: relative;
+  }
+
+  &__user-button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+
+    &:hover {
+      border-color: #3b82f6;
+    }
+
+    &:focus {
+      outline: none;
+      ring: 2px solid #3b82f6;
+      ring-offset: 2px;
+    }
+  }
+
+  &__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    background-color: #3b82f6;
+    color: #ffffff;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  &__username {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #1e293b;
+  }
+
+  &__arrow {
+    color: #94a3b8;
+  }
+
+  &__dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    min-width: 11rem;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    animation: slideDown 0.2s ease-out;
+    z-index: 100;
+  }
+
+  &__dropdown-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: #475569;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    font-family: inherit;
+
+    &:hover:not(&--disabled) {
+      background-color: #f1f5f9;
+    }
+
+    &--disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    &--logout {
+      color: #dc2626;
+
+      &:hover {
+        background-color: #fef2f2;
+      }
+    }
+
+    &:first-child {
+      border-radius: 0.75rem 0.75rem 0 0;
+    }
+
+    &:last-child {
+      border-radius: 0 0 0.75rem 0.75rem;
+    }
+  }
 }
 
-.navbar__logo {
-  font-weight: 600;
-  letter-spacing: 0.05em;
-}
-
-.navbar__links {
-  display: flex;
-  gap: 1rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.navbar__links a {
-  color: #cbd5f5;
-  text-decoration: none;
-}
-
-.navbar__links a.active {
-  color: #fff;
-}
-
-.navbar__auth {
-  color: #fbbf24;
-  text-decoration: none;
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

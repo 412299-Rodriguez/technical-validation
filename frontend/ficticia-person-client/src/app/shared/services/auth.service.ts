@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AuthSession } from '../../shared/models/auth.model';
+import { AuthSession } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +14,11 @@ export class AuthService {
 
   clearSession(): void {
     this.session$.next(null);
+  }
+
+  /** Clears the current session so UI components can treat the user as logged out. */
+  logout(): void {
+    this.clearSession();
   }
 
   isAuthenticated(): boolean {

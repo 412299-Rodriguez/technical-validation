@@ -29,10 +29,16 @@ export const routes: Routes = [
   },
   {
     path: '',
-    canActivate: [AuthGuard],
+    // TODO: Re-enable AuthGuard once the login flow is fully wired.
+    // canActivate: [AuthGuard],
     loadComponent: () =>
       import('./core/layouts/main-layout/main-layout.component').then((m) => m.MainLayoutComponent),
     children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/home-page/home-page.component').then((m) => m.HomePageComponent)
+      },
       {
         path: 'persons',
         children: [

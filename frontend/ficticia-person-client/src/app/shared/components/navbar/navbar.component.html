@@ -1,9 +1,63 @@
+<!-- 
+  Top Navigation Bar
+  Displays across the top of the application with user menu
+-->
 <nav class="navbar">
-  <a class="navbar__logo" routerLink="/">Ficticia</a>
-  <ul class="navbar__links">
-    <li *ngFor="let link of links">
-      <a routerLink="{{ link.path }}" routerLinkActive="active">{{ link.label }}</a>
-    </li>
-  </ul>
-  <a class="navbar__auth" routerLink="/auth/login">Cerrar sesión</a>
+  <!-- Company Branding -->
+  <div class="navbar__left">
+    <div class="navbar__brand">
+      <div class="navbar__brand-logo" [innerHTML]="safeLogoIcon" aria-hidden="true"></div>
+      <div class="navbar__brand-text">
+        <p class="navbar__brand-name">{{ branding.name }}</p>
+        <p *ngIf="branding.subtitle" class="navbar__brand-subtitle">{{ branding.subtitle }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Menu on the right -->
+  <div class="navbar__right">
+    <div class="navbar__user-menu">
+      <button 
+        type="button" 
+        class="navbar__user-button" 
+        (click)="toggleUserMenu()"
+        aria-label="User menu"
+        aria-expanded="{{ userMenuOpen }}">
+        <!-- User Avatar -->
+        <span class="navbar__avatar">{{ currentUser.initials }}</span>
+        <!-- User Name -->
+        <span class="navbar__username">{{ currentUser.name }}</span>
+        <!-- Dropdown Arrow Icon -->
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="16" 
+          height="16" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          class="navbar__arrow">
+          <path d="m6 9 6 6 6-6"/>
+        </svg>
+      </button>
+
+      <!-- Dropdown Menu -->
+      <div *ngIf="userMenuOpen" class="navbar__dropdown">
+        <button 
+          type="button" 
+          class="navbar__dropdown-item navbar__dropdown-item--disabled"
+          disabled>
+          Profile (soon)
+        </button>
+        <button 
+          type="button" 
+          class="navbar__dropdown-item navbar__dropdown-item--logout" 
+          (click)="onLogout()">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
 </nav>

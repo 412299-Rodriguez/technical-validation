@@ -1,0 +1,140 @@
+/**
+ * Sidebar Component Styles
+ * Left navigation panel with branding and links
+ */
+
+.sidebar {
+  display: none; // Hidden on mobile
+  flex-direction: column;
+  width: 16rem; // 256px
+  background-color: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  padding: 1.5rem;
+  gap: 2rem;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+
+  // Show on medium screens and up
+  @media (min-width: 768px) {
+    display: flex;
+  }
+
+  &__branding {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 1rem;
+    background-color: #3b82f6;
+    color: #ffffff;
+    flex-shrink: 0;
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  &__company {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__company-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__company-subtitle {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #64748b;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #f1f5f9;
+      color: #1e293b;
+    }
+
+    &--active {
+      background-color: #eff6ff;
+      color: #2563eb;
+
+      .sidebar__link-icon {
+        color: #2563eb;
+      }
+    }
+  }
+
+  &__link-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: inherit;
+
+    svg {
+      width: 1.125rem;
+      height: 1.125rem;
+      stroke: currentColor;
+    }
+  }
+
+  &__link-label {
+    flex: 1;
+  }
+
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+
+    &:hover {
+      background: #94a3b8;
+    }
+  }
+}
