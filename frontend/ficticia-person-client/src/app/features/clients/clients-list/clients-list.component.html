@@ -2,7 +2,18 @@
   <div class="flex-1">
     <div class="relative">
       <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
-        🔍
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-5 w-5">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
       </span>
       <input
         type="text"
@@ -30,7 +41,18 @@
       (click)="onNewClient()"
       class="inline-flex items-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
     >
-      <span class="mr-2">＋</span>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="mr-2 h-5 w-5 text-white">
+        <path d="M12 5v14"></path>
+        <path d="M5 12h14"></path>
+      </svg>
       New Client
     </button>
   </div>
@@ -71,10 +93,58 @@
             {{ client.active ? 'Active' : 'Inactive' }}
           </span>
         </td>
-        <td class="px-6 py-4 text-lg">
-          <span *ngIf="client.drives" class="mr-1" title="Drives">🚗</span>
-          <span *ngIf="client.wearsGlasses" class="mr-1" title="Wears glasses">👓</span>
-          <span *ngIf="client.diabetic" class="mr-1 text-orange-500" title="Diabetic">⚡</span>
+        <td class="px-6 py-4">
+          <div class="flex items-center gap-2">
+            <svg
+              *ngIf="client.drives"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-5 w-5 text-blue-600"
+              title="Drives">
+              <path d="M5 16l1.5-4.5A2 2 0 0 1 8.4 10h7.2a2 2 0 0 1 1.9 1.5L19 16"></path>
+              <circle cx="7.5" cy="16.5" r="1.5"></circle>
+              <circle cx="16.5" cy="16.5" r="1.5"></circle>
+              <path d="M3 16h18v2H3z"></path>
+            </svg>
+
+            <svg
+              *ngIf="client.wearsGlasses"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-5 w-5 text-indigo-500"
+              title="Wears glasses">
+              <circle cx="7" cy="15" r="3"></circle>
+              <circle cx="17" cy="15" r="3"></circle>
+              <path d="M10 15h4"></path>
+              <path d="M4.5 13L3 9h3.5"></path>
+              <path d="M19.5 13L21 9h-3.5"></path>
+            </svg>
+
+            <svg
+              *ngIf="client.diabetic"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-5 w-5 text-rose-500"
+              title="Diabetic">
+              <path d="M12 21s-8-4-8-10a5 5 0 0 1 8-4 5 5 0 0 1 8 4c0 6-8 10-8 10z"></path>
+              <path d="M12 10l-1 3h2l-1 3"></path>
+            </svg>
+          </div>
         </td>
         <td class="px-6 py-4 text-right">
           <button
