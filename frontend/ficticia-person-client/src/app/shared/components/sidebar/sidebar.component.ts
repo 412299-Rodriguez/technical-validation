@@ -31,9 +31,14 @@ export interface SidebarLink {
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent {
+  /** Sanitizer instance used to trust inline SVG markup. */
   private readonly sanitizer = inject(DomSanitizer);
+  /** Branding information currently applied to the sidebar. */
   private _branding: CompanyBranding = DEFAULT_COMPANY_BRANDING;
+  /** Sanitized logo ready to be injected in the template. */
   safeLogoIcon: SafeHtml = this.sanitizeLogo(DEFAULT_COMPANY_BRANDING.logoIcon);
+  /** Links decorated with their sanitized icon markup. */
+  displayLinks: Array<SidebarLink & { safeIcon: SafeHtml }> = [];
 
   /** Company branding information */
   @Input()
@@ -46,8 +51,18 @@ export class SidebarComponent {
   }
 
   /** Navigation links to display in the sidebar */
-  @Input() links: SidebarLink[] = [];
+  @Input()
+  set links(value: SidebarLink[]) {
+    const parsedLinks = value ?? [];
+    this.displayLinks = parsedLinks.map(link => ({
+      ...link,
+      safeIcon: this.sanitizeLogo(link.icon)
+    }));
+  }
 
+  /**
+   * Marks a raw SVG string as trusted so Angular can render it safely.
+   */
   private sanitizeLogo(svgMarkup: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(svgMarkup);
   }

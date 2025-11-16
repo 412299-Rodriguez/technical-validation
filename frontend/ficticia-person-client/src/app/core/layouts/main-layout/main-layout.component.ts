@@ -5,7 +5,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent, NavbarUser } from '../../../shared/components/navbar/navbar.component';
 import { CompanyBranding, DEFAULT_COMPANY_BRANDING } from '../../../shared/models/branding.model';
-import { AuthService } from '../../../shared/services/auth.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   standalone: true,

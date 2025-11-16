@@ -26,7 +26,9 @@ export interface NavbarUser {
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
+  /** Sanitizer instance used to trust inline SVG icons. */
   private readonly sanitizer = inject(DomSanitizer);
+  /** Branding currently applied to the navbar. */
   private _branding: CompanyBranding = DEFAULT_COMPANY_BRANDING;
 
   /** Current user information to display in the navbar */
@@ -40,6 +42,7 @@ export class NavbarComponent {
   get branding(): CompanyBranding {
     return this._branding;
   }
+  /** Sanitized company logo rendered on the navbar. */
   safeLogoIcon: SafeHtml = this.sanitizeLogo(DEFAULT_COMPANY_BRANDING.logoIcon);
   
   /** Event emitted when user clicks logout */
@@ -64,6 +67,9 @@ export class NavbarComponent {
     this.logout.emit();
   }
 
+  /**
+   * Marks an inline SVG string as safe so Angular can project it without stripping nodes.
+   */
   private sanitizeLogo(svgMarkup: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(svgMarkup);
   }

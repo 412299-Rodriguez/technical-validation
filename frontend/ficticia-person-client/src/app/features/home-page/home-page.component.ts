@@ -16,6 +16,9 @@ if (typeof window !== 'undefined') {
   });
 }
 
+/**
+ * Shape of the metric cards displayed at the top of the dashboard.
+ */
 interface DashboardMetric {
   id: string;
   label: string;
@@ -26,12 +29,18 @@ interface DashboardMetric {
   safeIconSvg?: SafeHtml;
 }
 
+/**
+ * Segment definition for the health factors pie chart.
+ */
 interface HealthFactorSlice {
   label: string;
   value: number;
   color: string;
 }
 
+/**
+ * Bucket definition for the age distribution bar chart.
+ */
 interface AgeDistributionBucket {
   label: string;
   value: number;
@@ -46,14 +55,20 @@ interface AgeDistributionBucket {
   imports: [CommonModule, SidebarComponent]
 })
 export class HomePageComponent implements AfterViewInit, OnDestroy {
+  /** Canvas reference for the pie chart instance. */
   @ViewChild('pieChartCanvas') pieChartCanvas?: ElementRef<HTMLCanvasElement>;
+  /** Canvas reference for the bar chart instance. */
   @ViewChild('barChartCanvas') barChartCanvas?: ElementRef<HTMLCanvasElement>;
 
+  /** Chart.js pie chart reference so it can be destroyed. */
   private pieChart?: any;
+  /** Chart.js bar chart reference so it can be destroyed. */
   private barChart?: any;
 
+  /** Branding shared with the sidebar and navbar components. */
   readonly sidebarBranding: CompanyBranding = DEFAULT_COMPANY_BRANDING;
 
+  /** Sidebar links rendered on the navigation rail. */
   readonly sidebarLinks: SidebarLink[] = [
     {
       label: 'Dashboard',
@@ -78,8 +93,10 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
     }
   ];
 
+  /** Metrics displayed on the summary cards. */
   metrics: DashboardMetric[] = [];
 
+  /** Data series used by the health factors pie chart. */
   readonly healthFactorSlices: HealthFactorSlice[] = [
     { label: 'Maneja', value: 4, color: '#8b5cf6' },
     { label: 'Usa lentes', value: 3, color: '#6366f1' },
@@ -87,6 +104,7 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
     { label: 'Otra enfermedad', value: 2, color: '#f97316' }
   ];
 
+  /** Data series used by the age distribution bar chart. */
   readonly ageDistribution: AgeDistributionBucket[] = [
     { label: '18-30', value: 1, color: '#60a5fa' },
     { label: '31-40', value: 2, color: '#3b82f6' },
@@ -94,12 +112,19 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
     { label: '51-60', value: 1, color: '#1d4ed8' }
   ];
 
+  /** Sanitizer used to safely project SVG icons into the DOM. */
   private readonly sanitizer = inject(DomSanitizer);
 
+  /**
+   * Build the metrics dataset as soon as the component is created.
+   */
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     this.initializeMetrics();
   }
 
+  /**
+   * Prepares the metric cards list and stores the sanitized SVG icon for each one.
+   */
   private initializeMetrics(): void {
     const rawMetrics: DashboardMetric[] = [
       {
@@ -158,6 +183,9 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
     }));
   }
 
+  /**
+   * When charts are part of the DOM, lazily instantiate them once Chart.js is registered.
+   */
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       const checkChart = setInterval(() => {
@@ -170,6 +198,9 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  /**
+   * Creates the health factors pie chart instance.
+   */
   private initializePieChart(): void {
     if (!this.pieChartCanvas || !Chart) return;
     
@@ -211,6 +242,9 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
     this.pieChart = new Chart(ctx, config);
   }
 
+  /**
+   * Creates the age distribution bar chart instance.
+   */
   private initializeBarChart(): void {
     if (!this.barChartCanvas || !Chart) return;
     
@@ -262,6 +296,9 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
     this.barChart = new Chart(ctx, config);
   }
 
+  /**
+   * Tear down Chart.js instances so they do not leak memory when the component is destroyed.
+   */
   ngOnDestroy(): void {
     if (this.pieChart) {
       this.pieChart.destroy();
