@@ -40,6 +40,11 @@ export const routes: Routes = [
           import('./features/home-page/home-page.component').then((m) => m.HomePageComponent)
       },
       {
+        path: 'clients',
+        loadComponent: () =>
+          import('./features/clients/clients-page.component').then((m) => m.ClientsPageComponent)
+      },
+      {
         path: 'persons',
         children: [
           {
