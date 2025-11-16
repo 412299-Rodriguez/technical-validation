@@ -8,7 +8,15 @@
         <p class="text-sm text-slate-500">Manage life insurance clients</p>
       </section>
 
-      <app-clients-list [clients]="clients"></app-clients-list>
+      <!-- The list notifies the parent via (newClient) so we can open the modal -->
+      <app-clients-list [clients]="clients" (newClient)="isNewClientModalOpen = true"></app-clients-list>
     </main>
   </div>
 </div>
+
+<app-modal
+  [title]="'New Client'"
+  [visible]="isNewClientModalOpen"
+  (closed)="isNewClientModalOpen = false">
+  <app-new-client-form></app-new-client-form>
+</app-modal>

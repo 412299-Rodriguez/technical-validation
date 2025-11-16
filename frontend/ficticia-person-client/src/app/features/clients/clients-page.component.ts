@@ -5,6 +5,8 @@ import { PersonResponse } from '../../shared/models/person.model';
 import { NavbarUser } from '../../shared/components/navbar/navbar.component';
 import { SidebarComponent, SidebarLink } from '../../shared/components/sidebar/sidebar.component';
 import { CompanyBranding, DEFAULT_COMPANY_BRANDING } from '../../shared/models/branding.model';
+import { ModalComponent } from '../../shared/components/modal/modal.component';
+import { NewClientFormComponent } from './new-client-form/new-client-form.component';
 
 /**
  * Page-level container that wires navbar, sidebar and the clients list view.
@@ -13,7 +15,7 @@ import { CompanyBranding, DEFAULT_COMPANY_BRANDING } from '../../shared/models/b
 @Component({
   standalone: true,
   selector: 'app-clients-page',
-  imports: [CommonModule, SidebarComponent, ClientsListComponent],
+  imports: [CommonModule, SidebarComponent, ClientsListComponent, ModalComponent, NewClientFormComponent],
   templateUrl: './clients-page.component.html',
   styleUrls: ['./clients-page.component.css']
 })
@@ -120,4 +122,7 @@ export class ClientsPageComponent {
       additionalAttributes: []
     }
   ];
+
+  /** Controls whether the New Client modal is visible. */
+  isNewClientModalOpen = false;
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PersonResponse } from '../../../shared/models/person.model';
 
@@ -17,6 +17,8 @@ import { PersonResponse } from '../../../shared/models/person.model';
 export class ClientsListComponent {
   /** Incoming client dataset supplied by the page container. */
   @Input() clients: PersonResponse[] = [];
+  /** Notifies parent components that the New Client CTA was selected. */
+  @Output() newClient = new EventEmitter<void>();
 
   /** Free text filter applied to name or identification. */
   searchTerm = '';
@@ -46,10 +48,9 @@ export class ClientsListComponent {
   }
 
   /**
-   * Placeholder hook for the New Client CTA.
-   * In a future iteration this should navigate to the creation form.
+   * Raises the output so parents can open the modal.
    */
   onNewClient(): void {
-    console.log('TODO: navigate to client creation page');
+    this.newClient.emit();
   }
 }

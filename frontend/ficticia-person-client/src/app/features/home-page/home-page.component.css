@@ -231,6 +231,12 @@
   background: #94a3b8;
 }
 
+@media (max-width: 767px) {
+  .dashboard-layout__main {
+    overflow: auto;
+  }
+}
+
 /* Canvas sizing */
 canvas {
   max-width: 100%;
