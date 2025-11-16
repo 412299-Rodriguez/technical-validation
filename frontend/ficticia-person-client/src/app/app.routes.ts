@@ -43,32 +43,6 @@ export const routes: Routes = [
         path: 'clients',
         loadComponent: () =>
           import('./features/clients/clients-page.component').then((m) => m.ClientsPageComponent)
-      },
-      {
-        path: 'persons',
-        children: [
-          {
-            path: '',
-            loadComponent: () =>
-              import('./features/persons/pages/person-list/person-list.component').then(
-                (m) => m.PersonListComponent
-              )
-          },
-          {
-            path: 'new',
-            loadComponent: () =>
-              import('./features/persons/pages/person-form/person-form.component').then(
-                (m) => m.PersonFormComponent
-              )
-          },
-          {
-            path: ':id',
-            loadComponent: () =>
-              import('./features/persons/pages/person-detail/person-detail.component').then(
-                (m) => m.PersonDetailComponent
-              )
-          }
-        ]
       }
     ]
   },
