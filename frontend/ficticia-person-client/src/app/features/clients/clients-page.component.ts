@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ClientsListComponent } from './clients-list/clients-list.component';
 import { PersonResponse } from '../../shared/models/person.model';
-import { NavbarComponent, NavbarUser } from '../../shared/components/navbar/navbar.component';
+import { NavbarUser } from '../../shared/components/navbar/navbar.component';
 import { SidebarComponent, SidebarLink } from '../../shared/components/sidebar/sidebar.component';
 import { CompanyBranding, DEFAULT_COMPANY_BRANDING } from '../../shared/models/branding.model';
 
@@ -13,7 +13,7 @@ import { CompanyBranding, DEFAULT_COMPANY_BRANDING } from '../../shared/models/b
 @Component({
   standalone: true,
   selector: 'app-clients-page',
-  imports: [CommonModule, NavbarComponent, SidebarComponent, ClientsListComponent],
+  imports: [CommonModule, SidebarComponent, ClientsListComponent],
   templateUrl: './clients-page.component.html',
   styleUrls: ['./clients-page.component.css']
 })
