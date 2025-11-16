@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { PersonResponse } from '../../../shared/models/person.model';
 
 /**
  * Reactive form embedded inside the modal to capture the data for a new client.
@@ -12,7 +14,12 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
   templateUrl: './new-client-form.component.html',
   styleUrls: ['./new-client-form.component.css']
 })
-export class NewClientFormComponent {
+export class NewClientFormComponent implements OnChanges {
+  @Input() mode: 'create' | 'edit' = 'create';
+  @Input() client: PersonResponse | null = null;
+  @Output() cancel = new EventEmitter<void>();
+  @Output() save = new EventEmitter<PersonResponse>();
+
   readonly form: FormGroup;
 
   constructor(private readonly fb: FormBuilder) {
@@ -28,6 +35,12 @@ export class NewClientFormComponent {
       otherDisease: ['', [Validators.maxLength(255)]],
       additionalAttributes: this.fb.array([])
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['client']) {
+      this.applyClientData();
+    }
   }
 
   get fullName() {
@@ -72,6 +85,7 @@ export class NewClientFormComponent {
 
     console.log('New client payload', this.form.value);
     // TODO: integrate with backend API once available.
+    this.save.emit(this.form.value as PersonResponse);
   }
 
   onAddAttribute(): void {
@@ -85,5 +99,48 @@ export class NewClientFormComponent {
 
   removeAttribute(index: number): void {
     this.additionalAttributes.removeAt(index);
+  }
+
+  private applyClientData(): void {
+    this.additionalAttributes.clear();
+
+    if (this.client) {
+      this.form.patchValue({
+        fullName: this.client.fullName,
+        identification: this.client.identification,
+        age: this.client.age,
+        gender: this.client.gender,
+        active: this.client.active,
+        drives: this.client.drives,
+        wearsGlasses: this.client.wearsGlasses,
+        diabetic: this.client.diabetic,
+        otherDisease: this.client.otherDisease ?? ''
+      });
+
+      (this.client.additionalAttributes ?? []).forEach((attr) => {
+        this.additionalAttributes.push(
+          this.fb.group({
+            key: [attr.key ?? '', [Validators.required, Validators.maxLength(50)]],
+            value: [attr.value ?? '', [Validators.required, Validators.maxLength(100)]]
+          })
+        );
+      });
+    } else {
+      this.form.reset({
+        fullName: '',
+        identification: '',
+        age: null,
+        gender: '',
+        active: true,
+        drives: false,
+        wearsGlasses: false,
+        diabetic: false,
+        otherDisease: ''
+      });
+    }
+  }
+
+  onCancel(): void {
+    this.cancel.emit();
   }
 }

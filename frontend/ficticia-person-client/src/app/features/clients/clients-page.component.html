@@ -8,15 +8,24 @@
         <p class="text-sm text-slate-500">Manage life insurance clients</p>
       </section>
 
-      <!-- The list notifies the parent via (newClient) so we can open the modal -->
-      <app-clients-list [clients]="clients" (newClient)="isNewClientModalOpen = true"></app-clients-list>
+      <!-- The list notifies the parent via outputs to open the modal -->
+      <app-clients-list
+        [clients]="clients"
+        (newClient)="openCreateModal()"
+        (editClient)="openEditModal($event)">
+      </app-clients-list>
     </main>
   </div>
 </div>
 
 <app-modal
-  [title]="'New Client'"
+  [title]="modalMode === 'create' ? 'New Client' : 'Edit Client'"
   [visible]="isNewClientModalOpen"
-  (closed)="isNewClientModalOpen = false">
-  <app-new-client-form></app-new-client-form>
+  (closed)="handleFormClose()">
+  <app-new-client-form
+    [mode]="modalMode"
+    [client]="selectedClient"
+    (cancel)="handleFormClose()"
+    (save)="handleFormSubmit($event)">
+  </app-new-client-form>
 </app-modal>

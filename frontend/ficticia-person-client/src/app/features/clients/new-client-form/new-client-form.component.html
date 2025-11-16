@@ -6,7 +6,7 @@
         type="text"
         formControlName="fullName"
         placeholder="John Doe"
-        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+      class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
     </div>
 
@@ -16,7 +16,7 @@
         type="text"
         formControlName="identification"
         placeholder="12345678"
-        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+      class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
     </div>
 
@@ -26,7 +26,7 @@
         type="number"
         formControlName="age"
         placeholder="30"
-        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+      class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
     </div>
 
@@ -34,7 +34,7 @@
       <label class="mb-1 block text-sm font-medium text-slate-700">Gender</label>
       <select
         formControlName="gender"
-        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+      class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
         <option value="" disabled>Select</option>
         <option value="MALE">Male</option>
         <option value="FEMALE">Female</option>
@@ -99,7 +99,7 @@
       rows="3"
       formControlName="otherDisease"
       placeholder="Describe any other disease..."
-      class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"></textarea>
+      class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"></textarea>
   </div>
 
   <div class="flex items-center justify-between">
@@ -123,12 +123,12 @@
       [formGroup]="group">
       <input
         type="text"
-        class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         placeholder="Key"
         formControlName="key" />
       <input
         type="text"
-        class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         placeholder="Value"
         formControlName="value" />
       <button
@@ -144,13 +144,14 @@
   <div class="flex justify-end gap-2 border-t border-slate-200 pt-4">
     <button
       type="button"
+      (click)="onCancel()"
       class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
       Cancel
     </button>
     <button
       type="submit"
       class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
-      Create Client
+      {{ mode === 'create' ? 'Create Client' : 'Save Changes' }}
     </button>
   </div>
 </form>

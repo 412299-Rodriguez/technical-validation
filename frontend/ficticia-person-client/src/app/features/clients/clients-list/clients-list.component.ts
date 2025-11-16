@@ -19,6 +19,8 @@ export class ClientsListComponent {
   @Input() clients: PersonResponse[] = [];
   /** Notifies parent components that the New Client CTA was selected. */
   @Output() newClient = new EventEmitter<void>();
+  /** Notifies parent components to edit an existing client. */
+  @Output() editClient = new EventEmitter<PersonResponse>();
 
   /** Free text filter applied to name or identification. */
   searchTerm = '';
@@ -52,5 +54,12 @@ export class ClientsListComponent {
    */
   onNewClient(): void {
     this.newClient.emit();
+  }
+
+  /**
+   * Emits the selected client so the parent can open the edit modal.
+   */
+  onEditClient(client: PersonResponse): void {
+    this.editClient.emit(client);
   }
 }

@@ -125,4 +125,27 @@ export class ClientsPageComponent {
 
   /** Controls whether the New Client modal is visible. */
   isNewClientModalOpen = false;
+  modalMode: 'create' | 'edit' = 'create';
+  selectedClient: PersonResponse | null = null;
+
+  openCreateModal(): void {
+    this.modalMode = 'create';
+    this.selectedClient = null;
+    this.isNewClientModalOpen = true;
+  }
+
+  openEditModal(client: PersonResponse): void {
+    this.modalMode = 'edit';
+    this.selectedClient = client;
+    this.isNewClientModalOpen = true;
+  }
+
+  handleFormClose(): void {
+    this.isNewClientModalOpen = false;
+  }
+
+  handleFormSubmit(payload: PersonResponse): void {
+    console.log('Client form submission payload', payload);
+    this.isNewClientModalOpen = false;
+  }
 }
