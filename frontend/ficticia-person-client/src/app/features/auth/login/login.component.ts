@@ -4,6 +4,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { FormFieldErrorComponent } from '../../../shared/components/form-field-error/form-field-error.component';
 
 type LoginForm = FormGroup<{
@@ -14,7 +15,7 @@ type LoginForm = FormGroup<{
 @Component({
   standalone: true,
   selector: 'app-login',
-  imports: [CommonModule, ReactiveFormsModule, FormFieldErrorComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, FormFieldErrorComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })

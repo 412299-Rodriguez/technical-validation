@@ -1,0 +1,94 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-50 to-slate-100 px-4">
+  <div class="bg-white rounded-3xl shadow-xl px-10 py-12 w-full max-w-md">
+    <div class="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center mx-auto mb-6 text-white">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 3l6 2v5.5c0 4.28-2.99 8.22-6 9.5-3.01-1.28-6-5.22-6-9.5V5l6-2z"
+        />
+      </svg>
+    </div>
+    <h1 class="text-2xl font-semibold text-slate-900 text-center">Crear cuenta</h1>
+    <p class="mt-1 text-sm text-slate-500 text-center">Registrarse como empleado</p>
+
+    <form class="mt-8 space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div>
+        <label for="fullName" class="block text-sm font-medium text-slate-700 mb-1">Nombre completo</label>
+        <input
+          id="fullName"
+          type="text"
+          placeholder="Juan Perez"
+          class="w-full border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400"
+          formControlName="fullName"
+        />
+        <app-form-field-error [control]="fullName"></app-form-field-error>
+      </div>
+
+      <div>
+        <label for="employeeId" class="block text-sm font-medium text-slate-700 mb-1">Credencial de empleado</label>
+        <input
+          id="employeeId"
+          type="text"
+          placeholder="EMP-12345"
+          class="w-full border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400"
+          formControlName="employeeId"
+        />
+        <app-form-field-error [control]="employeeId"></app-form-field-error>
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+        <input
+          id="email"
+          type="email"
+          placeholder="employee@ficticia.com"
+          autocomplete="email"
+          class="w-full border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400"
+          formControlName="email"
+        />
+        <app-form-field-error [control]="email"></app-form-field-error>
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          placeholder="********"
+          autocomplete="new-password"
+          class="w-full border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400"
+          formControlName="password"
+        />
+        <app-form-field-error [control]="password"></app-form-field-error>
+      </div>
+
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-slate-700 mb-1">Confirmar contraseña</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          placeholder="********"
+          autocomplete="new-password"
+          class="w-full border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400"
+          formControlName="confirmPassword"
+        />
+        <app-form-field-error [control]="confirmPassword"></app-form-field-error>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full mt-6 py-2.5 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm transition disabled:opacity-60 disabled:cursor-not-allowed"
+        [disabled]="form.invalid || submitting"
+      >
+        {{ submitting ? 'Creando cuenta...' : 'Crear cuenta' }}
+      </button>
+    </form>
+
+    <p class="mt-4 text-center text-sm text-slate-600">
+      ¿Ya tienes una cuenta?
+      <a routerLink="/auth/login" class="text-blue-600 hover:text-blue-700 font-medium">Ingresa aquí</a>
+    </p>
+    <p class="mt-6 text-center text-xs text-slate-400">Uso autorizado para empleados</p>
+  </div>
+</div>
