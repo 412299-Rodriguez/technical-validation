@@ -19,6 +19,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DataInitializer {
 
+    private static final String DEFAULT_ADMIN_USERNAME = "SUPERADMIN";
+    private static final String DEFAULT_ADMIN_EMAIL = "maximoagustinr@gmail.com";
+    private static final String DEFAULT_ADMIN_PASSWORD = "Prueba123#";
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -34,11 +38,11 @@ public class DataInitializer {
             RoleEntity adminRole = ensureRoleExists("ROLE_ADMIN");
             ensureRoleExists("ROLE_USER");
 
-            userRepository.findByUsername("admin").orElseGet(() -> {
+            userRepository.findByUsername(DEFAULT_ADMIN_USERNAME).orElseGet(() -> {
                 UserEntity admin = UserEntity.builder()
-                        .username("admin")
-                        .email("admin@ficticia.com")
-                        .password(passwordEncoder.encode("admin123"))
+                        .username(DEFAULT_ADMIN_USERNAME)
+                        .email(DEFAULT_ADMIN_EMAIL)
+                        .password(passwordEncoder.encode(DEFAULT_ADMIN_PASSWORD))
                         .enabled(true)
                         .build();
                 admin.getRoles().add(adminRole);

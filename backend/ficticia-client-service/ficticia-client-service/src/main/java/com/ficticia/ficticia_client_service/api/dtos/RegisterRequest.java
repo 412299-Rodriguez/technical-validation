@@ -1,7 +1,10 @@
 package com.ficticia.ficticia_client_service.api.dtos;
 
+import com.ficticia.ficticia_client_service.application.validators.PasswordPolicy;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,9 +35,10 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank
-    @Size(min = 8)
+    @Pattern(regexp = PasswordPolicy.REGEX, message = PasswordPolicy.MESSAGE)
     private String password;
 
     @NotBlank
+    @Pattern(regexp = PasswordPolicy.REGEX, message = PasswordPolicy.MESSAGE)
     private String confirmPassword;
 }

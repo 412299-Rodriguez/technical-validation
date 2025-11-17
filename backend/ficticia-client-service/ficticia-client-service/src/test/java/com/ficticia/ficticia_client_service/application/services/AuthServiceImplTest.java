@@ -40,6 +40,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @ExtendWith(MockitoExtension.class)
 class AuthServiceImplTest {
 
+    private static final String STRONG_PASSWORD = "Strong12!";
+
     @Mock
     private UserRepository userRepository;
 
@@ -62,14 +64,14 @@ class AuthServiceImplTest {
     void setUp() {
         loginRequest = new LoginRequest();
         loginRequest.setUsername("User01");
-        loginRequest.setPassword("Secret123");
+        loginRequest.setPassword(STRONG_PASSWORD);
         registerRequest = RegisterRequest.builder()
                 .fullName("User Test")
                 .employeeId("EMP-77")
                 .username("John.Doe")
                 .email("John.Doe@corp.com")
-                .password("Secret123")
-                .confirmPassword("Secret123")
+                .password(STRONG_PASSWORD)
+                .confirmPassword(STRONG_PASSWORD)
                 .build();
     }
 
@@ -104,7 +106,7 @@ class AuthServiceImplTest {
     void loginShouldFailWhenPasswordDoesNotMatch() {
         UserEntity user = userEntity(true, "encoded");
         when(userRepository.findByUsernameIgnoreCase("User01")).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches("Secret123", "encoded")).thenReturn(false);
+        when(passwordEncoder.matches(STRONG_PASSWORD, "encoded")).thenReturn(false);
 
         assertThatThrownBy(() -> authService.login(loginRequest))
                 .isInstanceOf(BusinessException.class)
@@ -119,7 +121,7 @@ class AuthServiceImplTest {
         UserEntity user = userEntity(true, "encoded");
         user.getRoles().add(role);
         when(userRepository.findByUsernameIgnoreCase("User01")).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches("Secret123", "encoded")).thenReturn(true);
+        when(passwordEncoder.matches(STRONG_PASSWORD, "encoded")).thenReturn(true);
         when(jwtTokenProvider.generateToken(anyString(), anyList())).thenReturn("jwt-token");
 
         LoginResponse response = authService.login(loginRequest);
@@ -198,7 +200,7 @@ class AuthServiceImplTest {
         when(userRepository.findByUsernameIgnoreCase("John.Doe")).thenReturn(Optional.empty());
         when(userRepository.findByEmailIgnoreCase("John.Doe@corp.com")).thenReturn(Optional.empty());
         when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(defaultRole));
-        when(passwordEncoder.encode("Secret123")).thenReturn("encoded-pass");
+        when(passwordEncoder.encode(STRONG_PASSWORD)).thenReturn("encoded-pass");
         ArgumentCaptor<UserEntity> captor = ArgumentCaptor.forClass(UserEntity.class);
         UserEntity persisted = userEntity(true, "encoded-pass");
         persisted.setUsername("john.doe");
@@ -217,7 +219,7 @@ class AuthServiceImplTest {
         assertThat(response.getUsername()).isEqualTo("john.doe");
         assertThat(response.getRoles()).containsExactly("ROLE_USER");
         assertThat(response.isEnabled()).isTrue();
-        verify(passwordEncoder).encode("Secret123");
+        verify(passwordEncoder).encode(STRONG_PASSWORD);
     }
 
     private UserEntity userEntity(final boolean enabled, final String password) {

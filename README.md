@@ -39,6 +39,9 @@ The focus is on **clean architecture**, **separation of concerns** and **product
   - Passwords stored hashed with **BCrypt**.
   - Stateless security (`sessionCreationPolicy(STATELESS)`).
   - Role-based authorization (e.g. `ROLE_ADMIN`, `ROLE_USER`).
+- **Password policy**
+  - Login and registration flows reuse the same rule: passwords must contain at least eight characters, two digits and one special character.
+  - The backend exposes this rule through `PasswordPolicy` (Bean Validation annotations use its constants) and the Angular client mirrors it with a shared validator for instant feedback.
 
 - **API documentation**
   - REST API documented with **Swagger / OpenAPI** via `springdoc-openapi`.

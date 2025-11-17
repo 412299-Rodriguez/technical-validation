@@ -10,6 +10,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { finalize } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FeedbackPanelComponent } from '../../../shared/components/feedback-panel/feedback-panel.component';
+import { PASSWORD_POLICY_MESSAGE, passwordStrengthValidator } from '../../../shared/validators/password-strength.validator';
 
 type LoginForm = FormGroup<{
   username: FormControl<string>;
@@ -26,6 +27,11 @@ type LoginForm = FormGroup<{
 export class LoginComponent {
   /** Reactive form that captures the login credentials. */
   readonly form: LoginForm;
+  /** Custom error messages injected into the shared field-error component. */
+  readonly passwordErrorMessages = {
+    passwordStrength: PASSWORD_POLICY_MESSAGE,
+    minlength: 'La contraseña debe tener al menos 8 caracteres.'
+  };
 
   isSubmitting = false;
   feedbackState = signal<{
@@ -42,7 +48,7 @@ export class LoginComponent {
   ) {
     this.form = this.fb.nonNullable.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(8), passwordStrengthValidator()]]
     });
   }
 

@@ -24,6 +24,8 @@ import org.springframework.http.ResponseEntity;
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
+    private static final String STRONG_PASSWORD = "Strong12!";
+
     @Mock
     private AuthService authService;
 
@@ -34,7 +36,7 @@ class AuthControllerTest {
     void shouldReturnTokenWhenLoginSucceeds() {
         LoginRequest request = new LoginRequest();
         request.setUsername("user");
-        request.setPassword("secret");
+        request.setPassword(STRONG_PASSWORD);
         LoginResponse responseBody = new LoginResponse();
         responseBody.setUsername("user");
         responseBody.setToken("jwt-token");
@@ -51,8 +53,8 @@ class AuthControllerTest {
     void shouldReturnCreatedResponseWhenRegisteringUser() {
         RegisterRequest request = RegisterRequest.builder()
                 .username("newuser")
-                .password("Secret123")
-                .confirmPassword("Secret123")
+                .password(STRONG_PASSWORD)
+                .confirmPassword(STRONG_PASSWORD)
                 .email("user@mail.com")
                 .employeeId("EMP-1")
                 .fullName("New User")

@@ -7,6 +7,7 @@ import { FormFieldErrorComponent } from '../../../shared/components/form-field-e
 import { AuthService } from '../../../core/services/auth.service';
 import { finalize } from 'rxjs';
 import { FeedbackPanelComponent } from '../../../shared/components/feedback-panel/feedback-panel.component';
+import { PASSWORD_POLICY_MESSAGE, passwordStrengthValidator } from '../../../shared/validators/password-strength.validator';
 
 type RegisterForm = FormGroup<{
   fullName: FormControl<string>;
@@ -36,6 +37,16 @@ type RegisterForm = FormGroup<{
 export class RegisterComponent {
   /** Reactive form capturing the registration details. */
   readonly form: RegisterForm;
+  private static readonly PASSWORD_MIN_LENGTH_MESSAGE = 'La contraseña debe tener al menos 8 caracteres.';
+  readonly passwordErrorMessages = {
+    passwordStrength: PASSWORD_POLICY_MESSAGE,
+    minlength: RegisterComponent.PASSWORD_MIN_LENGTH_MESSAGE
+  };
+  readonly confirmPasswordErrorMessages = {
+    passwordStrength: PASSWORD_POLICY_MESSAGE,
+    minlength: RegisterComponent.PASSWORD_MIN_LENGTH_MESSAGE,
+    passwordMismatch: 'Passwords must match.'
+  };
 
   submitting = false;
   feedbackState: {
@@ -62,8 +73,8 @@ export class RegisterComponent {
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       employeeId: ['', [Validators.required, Validators.maxLength(50)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
+      password: ['', [Validators.required, Validators.minLength(8), passwordStrengthValidator()]],
+      confirmPassword: ['', [Validators.required, Validators.minLength(8), passwordStrengthValidator()]]
     });
   }
 
