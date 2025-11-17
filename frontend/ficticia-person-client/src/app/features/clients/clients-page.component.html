@@ -40,13 +40,26 @@
 </div>
 
 <app-modal
-  [title]="modalMode === 'create' ? 'Añadir cliente' : 'Modificar Cliente'"
+  [title]="modalMode === 'create' ? 'Anadir cliente' : 'Modificar Cliente'"
   [visible]="isNewClientModalOpen"
   (closed)="handleFormClose()">
-  <app-new-client-form
-    [mode]="modalMode"
-    [client]="selectedClient"
-    (cancel)="handleFormClose()"
-    (save)="handleFormSubmit($event)">
-  </app-new-client-form>
+  <ng-container *ngIf="!feedbackState(); else feedbackPanel">
+    <app-new-client-form
+      [mode]="modalMode"
+      [client]="selectedClient"
+      [submitting]="saving()"
+      (cancel)="handleFormClose()"
+      (save)="handleFormSubmit($event)">
+    </app-new-client-form>
+  </ng-container>
+
+  <ng-template #feedbackPanel>
+    <app-feedback-panel
+      [type]="feedbackState()?.type ?? 'success'"
+      [title]="feedbackState()?.title ?? ''"
+      [message]="feedbackState()?.message ?? ''"
+      primaryButtonLabel="Cerrar"
+      (primaryAction)="onFeedbackClose()">
+    </app-feedback-panel>
+  </ng-template>
 </app-modal>

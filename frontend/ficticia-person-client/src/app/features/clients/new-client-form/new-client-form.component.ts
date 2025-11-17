@@ -1,7 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { PersonResponse } from '../../../shared/models/person.model';
+import { PersonPayload, PersonResponse } from '../../../shared/models/person.model';
+
+type AdditionalAttributeFormValue = {
+  id: number | null;
+  key: string;
+  value: string;
+};
 
 /**
  * Reactive form embedded inside the modal to capture the data for a new client.
@@ -13,11 +19,13 @@ import { PersonResponse } from '../../../shared/models/person.model';
   templateUrl: './new-client-form.component.html',
   styleUrls: ['./new-client-form.component.css']
 })
+
 export class NewClientFormComponent implements OnChanges {
   @Input() mode: 'create' | 'edit' = 'create';
   @Input() client: PersonResponse | null = null;
+  @Input() submitting = false;
   @Output() cancel = new EventEmitter<void>();
-  @Output() save = new EventEmitter<PersonResponse>();
+  @Output() save = new EventEmitter<PersonPayload>();
 
   readonly form: FormGroup;
 
@@ -82,14 +90,41 @@ export class NewClientFormComponent implements OnChanges {
       return;
     }
 
-    console.log('New client payload', this.form.value);
-    // TODO: integrate with backend API once available.
-    this.save.emit(this.form.value as PersonResponse);
+    const raw = this.form.getRawValue();
+    const includeAttributes =
+      this.mode === 'create'
+        ? this.additionalAttributes.length > 0
+        : this.additionalAttributes.dirty && this.additionalAttributes.length > 0;
+
+    const payload: PersonPayload = {
+      fullName: raw.fullName,
+      identification: raw.identification,
+      age: Number(raw.age),
+      gender: raw.gender,
+      active: !!raw.active,
+      drives: !!raw.drives,
+      wearsGlasses: !!raw.wearsGlasses,
+      diabetic: !!raw.diabetic,
+      otherDisease: raw.otherDisease?.trim() ? raw.otherDisease.trim() : null
+    };
+
+    if (includeAttributes) {
+      payload.additionalAttributes = (
+        this.additionalAttributes.value as AdditionalAttributeFormValue[]
+      ).map((attr) => ({
+        id: attr.id ?? null,
+        key: attr.key,
+        value: attr.value
+      }));
+    }
+
+    this.save.emit(payload);
   }
 
   onAddAttribute(): void {
     this.additionalAttributes.push(
       this.fb.group({
+        id: [null],
         key: ['', [Validators.required, Validators.maxLength(50)]],
         value: ['', [Validators.required, Validators.maxLength(100)]]
       })
@@ -119,6 +154,7 @@ export class NewClientFormComponent implements OnChanges {
       (this.client.additionalAttributes ?? []).forEach((attr) => {
         this.additionalAttributes.push(
           this.fb.group({
+            id: [attr.id ?? null],
             key: [attr.key ?? '', [Validators.required, Validators.maxLength(50)]],
             value: [attr.value ?? '', [Validators.required, Validators.maxLength(100)]]
           })
@@ -137,6 +173,9 @@ export class NewClientFormComponent implements OnChanges {
         otherDisease: ''
       });
     }
+
+    this.additionalAttributes.markAsPristine();
+    this.additionalAttributes.markAsUntouched();
   }
 
   onCancel(): void {

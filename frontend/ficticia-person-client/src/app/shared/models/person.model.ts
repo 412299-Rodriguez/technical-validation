@@ -26,3 +26,16 @@ export interface PersonResponse {
   otherDisease: string | null;
   additionalAttributes: AdditionalAttribute[];
 }
+
+export interface PersonPayload {
+  fullName: string;
+  identification: string;
+  age: number;
+  gender: 'MALE' | 'FEMALE' | 'OTHER';
+  active: boolean;
+  drives: boolean;
+  wearsGlasses: boolean;
+  diabetic: boolean;
+  otherDisease: string | null;
+  additionalAttributes?: AdditionalAttribute[];
+}

@@ -1,13 +1,16 @@
-import { CommonModule, DOCUMENT } from '@angular/common';
-import { Component, DestroyRef, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { SidebarComponent, SidebarLink } from '../../shared/components/sidebar/sidebar.component';
 import { ClientsListComponent } from './clients-list/clients-list.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { NewClientFormComponent } from './new-client-form/new-client-form.component';
 import { CompanyBranding, DEFAULT_COMPANY_BRANDING } from '../../shared/models/branding.model';
-import { PersonResponse } from '../../shared/models/person.model';
+import { PersonPayload, PersonResponse } from '../../shared/models/person.model';
 import { PersonService } from '../../core/services/person.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FeedbackPanelComponent } from '../../shared/components/feedback-panel/feedback-panel.component';
+import { HttpErrorResponse } from '@angular/common/http';
+import { finalize } from 'rxjs';
 
 /**
  * Page-level container that wires navbar, sidebar and the clients list view.
@@ -16,11 +19,18 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
   standalone: true,
   selector: 'app-clients-page',
-  imports: [CommonModule, SidebarComponent, ClientsListComponent, ModalComponent, NewClientFormComponent],
+  imports: [
+    CommonModule,
+    SidebarComponent,
+    ClientsListComponent,
+    ModalComponent,
+    NewClientFormComponent,
+    FeedbackPanelComponent
+  ],
   templateUrl: './clients-page.component.html',
   styleUrls: ['./clients-page.component.css']
 })
-export class ClientsPageComponent implements OnInit, OnDestroy {
+export class ClientsPageComponent implements OnInit {
   /** Company branding shared with navbar/sidebar. */
   readonly sidebarBranding: CompanyBranding = DEFAULT_COMPANY_BRANDING;
 
@@ -53,6 +63,12 @@ export class ClientsPageComponent implements OnInit, OnDestroy {
   readonly clients = signal<PersonResponse[]>([]);
   readonly isLoading = signal<boolean>(false);
   readonly loadError = signal<string>('');
+  readonly saving = signal<boolean>(false);
+  readonly feedbackState = signal<{
+    type: 'success' | 'warning' | 'error';
+    title: string;
+    message: string;
+  } | null>(null);
 
   /** Controls whether the New Client modal is visible. */
   isNewClientModalOpen = false;
@@ -61,15 +77,9 @@ export class ClientsPageComponent implements OnInit, OnDestroy {
 
   private readonly personService = inject(PersonService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly document = inject(DOCUMENT);
 
   ngOnInit(): void {
-    this.enableBodyScroll();
     this.loadClients();
-  }
-
-  ngOnDestroy(): void {
-    this.restoreBodyScroll();
   }
 
   private loadClients(): void {
@@ -93,36 +103,74 @@ export class ClientsPageComponent implements OnInit, OnDestroy {
       });
   }
 
-  private enableBodyScroll(): void {
-    const htmlElement = this.document.documentElement;
-    htmlElement.style.overflow = 'auto';
-    this.document.body.style.overflow = 'auto';
-  }
-
-  private restoreBodyScroll(): void {
-    const htmlElement = this.document.documentElement;
-    htmlElement.style.overflow = '';
-    this.document.body.style.overflow = '';
-  }
-
   openCreateModal(): void {
     this.modalMode = 'create';
     this.selectedClient = null;
+    this.feedbackState.set(null);
     this.isNewClientModalOpen = true;
   }
 
   openEditModal(client: PersonResponse): void {
     this.modalMode = 'edit';
     this.selectedClient = client;
+    this.feedbackState.set(null);
     this.isNewClientModalOpen = true;
   }
 
   handleFormClose(): void {
+    this.feedbackState.set(null);
+    this.saving.set(false);
+    this.modalMode = 'create';
+    this.selectedClient = null;
     this.isNewClientModalOpen = false;
   }
 
-  handleFormSubmit(payload: PersonResponse): void {
-    console.log('Client form submission payload', payload);
-    this.isNewClientModalOpen = false;
+  handleFormSubmit(payload: PersonPayload): void {
+    if (this.modalMode !== 'edit' || !this.selectedClient) {
+      console.warn('Create operation not implemented yet.');
+      return;
+    }
+
+    this.saving.set(true);
+
+    this.personService
+      .updatePerson(this.selectedClient.id, payload)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.saving.set(false);
+        })
+      )
+      .subscribe({
+        next: (updated) => {
+          this.clients.update((list) =>
+            list.map((client) => (client.id === updated.id ? updated : client))
+          );
+          this.selectedClient = updated;
+          this.feedbackState.set({
+            type: 'success',
+            title: 'Cliente actualizado',
+            message: `${updated.fullName} fue actualizado correctamente.`
+          });
+        },
+        error: (error: HttpErrorResponse) => {
+          const isValidationIssue = error.status >= 400 && error.status < 500;
+          const message =
+            error.error?.message ??
+            (isValidationIssue
+              ? 'Revisa la información ingresada e intenta nuevamente.'
+              : 'No pudimos actualizar al cliente. Intenta nuevamente más tarde.');
+          this.feedbackState.set({
+            type: isValidationIssue ? 'warning' : 'error',
+            title: isValidationIssue ? 'Revisa los datos' : 'Error inesperado',
+            message
+          });
+        }
+      });
+  }
+
+  onFeedbackClose(): void {
+    this.feedbackState.set(null);
+    this.handleFormClose();
   }
 }
