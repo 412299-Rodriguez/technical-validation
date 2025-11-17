@@ -27,11 +27,11 @@ export class ResetPasswordComponent {
   readonly form: ResetPasswordForm;
   readonly passwordErrorMessages = {
     passwordStrength: PASSWORD_POLICY_MESSAGE,
-    minlength: 'Password must include at least eight characters.'
+    minlength: 'La contraseña debe tener al menos 8 caracteres.',
   };
   readonly confirmPasswordErrorMessages = {
     ...this.passwordErrorMessages,
-    passwordMismatch: 'Passwords must match.'
+    passwordMismatch: 'Las contraseñas no coinciden.'
   };
 
   readonly feedbackState = signal<{
@@ -59,9 +59,9 @@ export class ResetPasswordComponent {
     if (!this.token) {
       this.feedbackState.set({
         type: 'error',
-        title: 'Invalid reset link',
-        message: 'The reset link is missing or expired. Please request a new email.',
-        primaryLabel: 'Back to login'
+        title: 'Link inválido',
+        message: 'El link de restablecimiento de contraseña no es válido o ha expirado. Solicite un nuevo enlace para continuar.',
+        primaryLabel: 'Volver al inicio de sesión'
       });
       this.form.disable();
     }
@@ -114,20 +114,20 @@ export class ResetPasswordComponent {
   private showSuccess(): void {
     this.feedbackState.set({
       type: 'success',
-      title: 'Password updated',
-      message: 'Your password has been changed successfully. You can now login with the new credentials.',
-      primaryLabel: 'Go to login'
+      title: 'Contraseña restablecida',
+      message: 'Tu contraseña ha sido restablecida exitosamente. Ahora puedes iniciar sesión con tu nueva contraseña.',
+      primaryLabel: 'Volver al inicio de sesión'
     });
     this.cdr.markForCheck();
   }
 
   private showError(error: HttpErrorResponse): void {
-    const message = error.error?.message ?? 'Unable to reset the password. Request a new link and try again.';
+    const message = error.error?.message ?? 'No se pudo restablecer la contraseña. Por favor, intenta nuevamente más tarde.';
     this.feedbackState.set({
       type: 'error',
-      title: 'Reset failed',
+      title: 'Restablecimiento fallido',
       message,
-      primaryLabel: 'Close'
+      primaryLabel: 'Cerrar'
     });
     this.cdr.markForCheck();
   }
