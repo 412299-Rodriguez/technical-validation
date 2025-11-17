@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ClientsListComponent } from './clients-list/clients-list.component';
 import { PersonResponse } from '../../shared/models/person.model';
-import { NavbarUser } from '../../shared/components/navbar/navbar.component';
 import { SidebarComponent, SidebarLink } from '../../shared/components/sidebar/sidebar.component';
 import { CompanyBranding, DEFAULT_COMPANY_BRANDING } from '../../shared/models/branding.model';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
@@ -22,12 +21,6 @@ import { NewClientFormComponent } from './new-client-form/new-client-form.compon
 export class ClientsPageComponent {
   /** Company branding shared with navbar/sidebar. */
   readonly sidebarBranding: CompanyBranding = DEFAULT_COMPANY_BRANDING;
-
-  /** User details shown in the navbar menu. */
-  readonly currentUser: NavbarUser = {
-    name: 'Juan Perez',
-    initials: 'JP'
-  };
 
   /** Sidebar navigation options, highlighting the current section. */
   readonly sidebarLinks: SidebarLink[] = [

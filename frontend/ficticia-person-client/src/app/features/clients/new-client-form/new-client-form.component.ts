@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { PersonResponse } from '../../../shared/models/person.model';
 
 /**

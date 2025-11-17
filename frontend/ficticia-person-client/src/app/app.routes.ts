@@ -29,8 +29,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    // TODO: Re-enable AuthGuard once the login flow is fully wired.
-    // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
     loadComponent: () =>
       import('./core/layouts/main-layout/main-layout.component').then((m) => m.MainLayoutComponent),
     children: [

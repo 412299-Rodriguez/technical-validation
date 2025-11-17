@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormFieldErrorComponent } from '../../../shared/components/form-field-error/form-field-error.component';
+import { AuthService } from '../../../core/services/auth.service';
+import { finalize } from 'rxjs';
 
 type RegisterForm = FormGroup<{
   fullName: FormControl<string>;
@@ -32,8 +34,10 @@ export class RegisterComponent {
   readonly form: RegisterForm;
 
   submitting = false;
+  errorMessage = '';
+  successMessage = '';
 
-  constructor(private readonly fb: FormBuilder) {
+  constructor(private readonly fb: FormBuilder, private readonly authService: AuthService, private readonly router: Router) {
     this.form = this.buildForm();
   }
 
@@ -78,11 +82,22 @@ export class RegisterComponent {
     }
 
     this.submitting = true;
+    this.errorMessage = '';
+    this.successMessage = '';
     const payload = this.form.getRawValue();
-    console.log('Register payload', payload);
-    // TODO: call registration endpoint here
-    this.form.reset();
-    this.submitting = false;
+
+    this.authService
+      .register(payload)
+      .pipe(finalize(() => (this.submitting = false)))
+      .subscribe({
+        next: () => {
+          this.successMessage = 'Account created! You can log in now.';
+          setTimeout(() => this.router.navigate(['/auth/login']), 1200);
+        },
+        error: () => {
+          this.errorMessage = 'Unable to register. Please check your data and try again.';
+        }
+      });
   }
 
   private ensurePasswordsMatch(): boolean {

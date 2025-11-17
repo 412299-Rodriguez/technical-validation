@@ -4,11 +4,13 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormFieldErrorComponent } from '../../../shared/components/form-field-error/form-field-error.component';
+import { AuthService } from '../../../core/services/auth.service';
+import { finalize } from 'rxjs';
 
 type LoginForm = FormGroup<{
-  email: FormControl<string>;
+  username: FormControl<string>;
   password: FormControl<string>;
 }>;
 
@@ -24,15 +26,16 @@ export class LoginComponent {
   readonly form: LoginForm;
 
   isSubmitting = false;
+  errorMessage = '';
 
-  constructor(private readonly fb: FormBuilder) {
+  constructor(private readonly fb: FormBuilder, private readonly authService: AuthService, private readonly router: Router) {
     this.form = this.fb.nonNullable.group({
-      email: ['', [Validators.required, Validators.email]],
+      username: ['', [Validators.required, Validators.minLength(3)]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
-  /** Handles the submit intent and simulates async processing. */
+  /** Handles the submit event and calls the real authentication API. */
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -40,9 +43,16 @@ export class LoginComponent {
     }
 
     this.isSubmitting = true;
-    setTimeout(() => {
-      // TODO: conectar con AuthService y API de login
-      this.isSubmitting = false;
-    }, 1000);
+    this.errorMessage = '';
+
+    this.authService
+      .login(this.form.getRawValue())
+      .pipe(finalize(() => (this.isSubmitting = false)))
+      .subscribe({
+        next: () => this.router.navigate(['/dashboard']),
+        error: () => {
+          this.errorMessage = 'Invalid credentials, please try again.';
+        }
+      });
   }
 }

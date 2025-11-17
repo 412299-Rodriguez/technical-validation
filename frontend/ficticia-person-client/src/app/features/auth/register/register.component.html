@@ -83,6 +83,9 @@
       >
         {{ submitting ? 'Creando cuenta...' : 'Crear cuenta' }}
       </button>
+
+      <p *ngIf="successMessage" class="text-center text-sm text-emerald-600">{{ successMessage }}</p>
+      <p *ngIf="errorMessage" class="text-center text-sm text-red-600">{{ errorMessage }}</p>
     </form>
 
     <p class="mt-4 text-center text-sm text-slate-600">
