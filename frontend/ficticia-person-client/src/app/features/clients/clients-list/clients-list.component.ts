@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PersonResponse } from '../../../shared/models/person.model';
 
@@ -21,6 +21,8 @@ export class ClientsListComponent {
   @Output() newClient = new EventEmitter<void>();
   /** Notifies parent components to edit an existing client. */
   @Output() editClient = new EventEmitter<PersonResponse>();
+  /** Notifies parent components to delete an existing client. */
+  @Output() deleteClient = new EventEmitter<PersonResponse>();
 
   /** Free text filter applied to name or identification. */
   searchTerm = '';
@@ -29,6 +31,8 @@ export class ClientsListComponent {
   statusFilter: 'ALL' | 'ACTIVE' | 'INACTIVE' = 'ALL';
   /** Current sort direction applied to the ID column (newest vs oldest). */
   sortDirection: 'asc' | 'desc' = 'desc';
+  /** Tracks which action-menu is expanded. */
+  openActionsForId: number | null = null;
 
   /**
    * Returns the dataset filtered by the search term and the status selector.
@@ -71,6 +75,7 @@ export class ClientsListComponent {
    * Emits the selected client so the parent can open the edit modal.
    */
   onEditClient(client: PersonResponse): void {
+    this.openActionsForId = null;
     this.editClient.emit(client);
   }
 
@@ -86,5 +91,20 @@ export class ClientsListComponent {
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase();
+  }
+
+  onDeleteClient(client: PersonResponse): void {
+    this.openActionsForId = null;
+    this.deleteClient.emit(client);
+  }
+
+  toggleActionsMenu(id: number, event: Event): void {
+    event.stopPropagation();
+    this.openActionsForId = this.openActionsForId === id ? null : id;
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.openActionsForId = null;
   }
 }

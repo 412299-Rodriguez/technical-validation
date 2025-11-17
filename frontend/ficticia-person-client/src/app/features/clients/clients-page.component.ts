@@ -74,6 +74,8 @@ export class ClientsPageComponent implements OnInit, OnDestroy {
   isNewClientModalOpen = false;
   modalMode: 'create' | 'edit' = 'create';
   selectedClient: PersonResponse | null = null;
+  pendingDelete: PersonResponse | null = null;
+  deleting = signal<boolean>(false);
 
   private readonly personService = inject(PersonService);
   private readonly destroyRef = inject(DestroyRef);
@@ -211,5 +213,45 @@ export class ClientsPageComponent implements OnInit, OnDestroy {
   onFeedbackClose(): void {
     this.feedbackState.set(null);
     this.handleFormClose();
+  }
+
+  promptDelete(client: PersonResponse): void {
+    this.pendingDelete = client;
+  }
+
+  cancelDelete(): void {
+    this.pendingDelete = null;
+  }
+
+  confirmDelete(): void {
+    if (!this.pendingDelete) {
+      return;
+    }
+    this.deleting.set(true);
+    const clientToDelete = this.pendingDelete;
+
+    this.personService
+      .deletePerson(clientToDelete.id)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.deleting.set(false);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.clients.update((list) => list.filter((client) => client.id !== clientToDelete.id));
+          this.pendingDelete = null;
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('Failed to delete client', error);
+          this.feedbackState.set({
+            type: 'error',
+            title: 'No se pudo eliminar',
+            message: error.error?.message ?? 'Intenta nuevamente en unos minutos.'
+          });
+          this.pendingDelete = null;
+        }
+      });
   }
 }

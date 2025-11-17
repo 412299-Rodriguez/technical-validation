@@ -10,13 +10,14 @@
 
       <!-- The list notifies the parent via outputs to open the modal -->
       <ng-container *ngIf="!isLoading(); else loadingState">
-        <ng-container *ngIf="clients().length > 0; else emptyState">
-          <app-clients-list
-            [clients]="clients()"
-            (newClient)="openCreateModal()"
-            (editClient)="openEditModal($event)">
-          </app-clients-list>
-        </ng-container>
+      <ng-container *ngIf="clients().length > 0; else emptyState">
+        <app-clients-list
+          [clients]="clients()"
+          (newClient)="openCreateModal()"
+          (editClient)="openEditModal($event)"
+          (deleteClient)="promptDelete($event)">
+        </app-clients-list>
+      </ng-container>
       </ng-container>
 
       <div *ngIf="loadError()" class="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
@@ -63,3 +64,36 @@
     </app-feedback-panel>
   </ng-template>
 </app-modal>
+
+<div *ngIf="pendingDelete" class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+  <div class="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+    <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a1 1 0 0 0 .86 1.5h18.64a1 1 0 0 0 .86-1.5L13.71 3.86a1 1 0 0 0-1.72 0z" />
+      </svg>
+    </div>
+    <h3 class="text-center text-lg font-semibold text-slate-900">¿Estás seguro?</h3>
+    <p class="mt-2 text-center text-sm text-slate-500">
+      Esta acción eliminará al cliente
+      <span class="font-semibold">{{ pendingDelete.fullName }}</span>.
+    </p>
+    <div class="mt-6 flex justify-center gap-3">
+      <button
+        type="button"
+        class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+        (click)="cancelDelete()">
+        Cancelar
+      </button>
+      <button
+        type="button"
+        [disabled]="deleting()"
+        class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-60"
+        (click)="confirmDelete()">
+        {{ deleting() ? 'Eliminando...' : 'Eliminar' }}
+      </button>
+    </div>
+  </div>
+</div>

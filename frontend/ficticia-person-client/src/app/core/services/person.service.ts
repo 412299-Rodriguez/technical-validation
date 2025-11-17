@@ -32,4 +32,11 @@ export class PersonService {
   createPerson(payload: PersonPayload): Observable<PersonResponse> {
     return this.http.post<PersonResponse>(this.resourceUrl, payload);
   }
+
+  /**
+   * Deletes a person by its identifier.
+   */
+  deletePerson(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.resourceUrl}/${id}`);
+  }
 }
