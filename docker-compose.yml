@@ -23,12 +23,24 @@ services:
     restart: always
     depends_on:
       - db
+      - mailhog
+    env_file:
+      - .env
     environment:
-      DB_HOST: db
-      DB_NAME: ficticia_insurance
-      DB_USER: ficticia
-      DB_PASSWORD: ficticia
-      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: ${DB_HOST:-db}
+      DB_NAME: ${DB_NAME:-ficticia_insurance}
+      DB_USER: ${DB_USER:-ficticia}
+      DB_PASSWORD: ${DB_PASSWORD:-ficticia}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
+      MAIL_HOST: ${MAIL_HOST:-mailhog}
+      MAIL_PORT: ${MAIL_PORT:-1025}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_SMTP_AUTH: ${MAIL_SMTP_AUTH:-false}
+      MAIL_SMTP_STARTTLS: ${MAIL_SMTP_STARTTLS:-false}
+      APP_FRONTEND_BASE_URL: ${APP_FRONTEND_BASE_URL:-http://localhost:4200}
+      JWT_SECRET: ${JWT_SECRET:-Y2hhbmdlLXRoaXMtdG8tYS12ZXJ5LXN0cm9uZy1zZWNyZXQta2V5LXdpdGgtNTQtYnl0ZXM=}
+      JWT_EXPIRATION_MILLIS: ${JWT_EXPIRATION_MILLIS:-3600000}
     ports:
       - "8080:8080"
 
@@ -42,6 +54,14 @@ services:
       - backend
     ports:
       - "4200:80"
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: ficticia-mailhog
+    restart: always
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
 volumes:
   db_data:

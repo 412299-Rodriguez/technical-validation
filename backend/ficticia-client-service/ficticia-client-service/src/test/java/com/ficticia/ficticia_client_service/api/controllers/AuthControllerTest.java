@@ -4,10 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ficticia.ficticia_client_service.api.dtos.ForgotPasswordRequest;
 import com.ficticia.ficticia_client_service.api.dtos.LoginRequest;
 import com.ficticia.ficticia_client_service.api.dtos.LoginResponse;
 import com.ficticia.ficticia_client_service.api.dtos.RegisterRequest;
 import com.ficticia.ficticia_client_service.api.dtos.RegisterResponse;
+import com.ficticia.ficticia_client_service.api.dtos.ResetPasswordRequest;
 import com.ficticia.ficticia_client_service.application.services.AuthService;
 
 import org.junit.jupiter.api.Test;
@@ -70,5 +72,31 @@ class AuthControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isEqualTo(responseBody);
         verify(authService).register(request);
+    }
+
+    @Test
+    void shouldAcceptForgotPasswordRequest() {
+        ForgotPasswordRequest request = ForgotPasswordRequest.builder()
+                .email("user@mail.com")
+                .build();
+
+        ResponseEntity<Void> response = authController.requestPasswordReset(request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
+        verify(authService).requestPasswordReset(request);
+    }
+
+    @Test
+    void shouldResetPassword() {
+        ResetPasswordRequest request = ResetPasswordRequest.builder()
+                .token("token")
+                .password(STRONG_PASSWORD)
+                .confirmPassword(STRONG_PASSWORD)
+                .build();
+
+        ResponseEntity<Void> response = authController.resetPassword(request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        verify(authService).resetPassword(request);
     }
 }

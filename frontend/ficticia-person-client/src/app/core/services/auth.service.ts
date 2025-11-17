@@ -1,7 +1,15 @@
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, map, tap } from 'rxjs';
-import { AuthSession, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '../../shared/models/auth.model';
+import {
+  AuthSession,
+  ForgotPasswordRequest,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+  ResetPasswordRequest
+} from '../../shared/models/auth.model';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../environments/environment';
 
@@ -93,5 +101,15 @@ export class AuthService {
   register(payload: RegisterRequest): Observable<RegisterResponse> {
     const url = `${environment.apiBaseUrl}/api/auth/register`;
     return this.http.post<RegisterResponse>(url, payload);
+  }
+
+  requestPasswordReset(payload: ForgotPasswordRequest): Observable<void> {
+    const url = `${environment.apiBaseUrl}/api/auth/password/forgot`;
+    return this.http.post<void>(url, payload);
+  }
+
+  resetPassword(payload: ResetPasswordRequest): Observable<void> {
+    const url = `${environment.apiBaseUrl}/api/auth/password/reset`;
+    return this.http.post<void>(url, payload);
   }
 }

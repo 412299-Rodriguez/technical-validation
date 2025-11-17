@@ -1,5 +1,6 @@
 package com.ficticia.ficticia_client_service.infrastructure.entities;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,6 +47,12 @@ public class UserEntity {
 
     @Column(nullable = false)
     private Boolean enabled;
+
+    @Column(name = "reset_token", length = 120)
+    private String passwordResetToken;
+
+    @Column(name = "reset_token_expires_at")
+    private Instant passwordResetTokenExpiresAt;
 
     @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER)

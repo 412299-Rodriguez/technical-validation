@@ -39,6 +39,7 @@ The focus is on **clean architecture**, **separation of concerns** and **product
   - Passwords stored hashed with **BCrypt**.
   - Stateless security (`sessionCreationPolicy(STATELESS)`).
   - Role-based authorization (e.g. `ROLE_ADMIN`, `ROLE_USER`).
+  - Password recovery flow that issues reset links via email (Spring Mail) and enforces the shared password policy end to end.
 - **Password policy**
   - Login and registration flows reuse the same rule: passwords must contain at least eight characters, two digits and one special character.
   - The backend exposes this rule through `PasswordPolicy` (Bean Validation annotations use its constants) and the Angular client mirrors it with a shared validator for instant feedback.
@@ -132,3 +133,51 @@ ficticia-insurance/
  └─ frontend/
      └─ ficticia-person-client/   # Angular application
 ```
+
+---
+
+## 6. Password Recovery Setup
+
+The forgot/reset password feature requires SMTP credentials. Configure them via environment variables (or override the properties files directly):
+
+| Property | Description | Default |
+| --- | --- | --- |
+| `MAIL_HOST` / `spring.mail.host` | SMTP server hostname | `mailhog` (Docker) / `localhost` (dev) |
+| `MAIL_PORT` / `spring.mail.port` | SMTP port | `1025` |
+| `MAIL_USERNAME` | SMTP username (if required) | _empty_ |
+| `MAIL_PASSWORD` | SMTP password (if required) | _empty_ |
+| `MAIL_SMTP_AUTH` | Enables SMTP auth (`true` for Gmail/Mailtrap) | `false` |
+| `MAIL_SMTP_STARTTLS` | Enables STARTTLS (`true` for Gmail/Mailtrap) | `false` |
+| `APP_FRONTEND_BASE_URL` | Base URL used to build reset links | `http://localhost:4200` |
+| `APP_RESET_TOKEN_MINUTES` | Token time-to-live (minutes) | `60` |
+
+> `docker-compose up` now starts a [MailHog](https://github.com/mailhog/MailHog) container reachable at `http://localhost:8025` (UI) and `localhost:1025` (SMTP). Use it to inspect password-reset mails locally without touching a real mailbox. To hit a real SMTP provider, copy `.env.example` into `.env` and change the `MAIL_*` values (e.g., Gmail app password, Mailtrap credentials) plus set `MAIL_SMTP_AUTH=true` and `MAIL_SMTP_STARTTLS=true`.
+
+Typical `.env` scenarios:
+
+1. **Local testing (default)**  
+   ```
+   MAIL_HOST=mailhog
+   MAIL_PORT=1025
+   MAIL_SMTP_AUTH=false
+   MAIL_SMTP_STARTTLS=false
+   ```
+   Inspect messages at `http://localhost:8025`.
+
+2. **Gmail / Mailtrap / Provider with TLS**  
+   ```
+   MAIL_HOST=smtp.gmail.com
+   MAIL_PORT=587
+   MAIL_USERNAME=your-account@gmail.com
+   MAIL_PASSWORD=app-password
+   MAIL_SMTP_AUTH=true
+   MAIL_SMTP_STARTTLS=true
+   ```
+   Remember to restart Docker (`docker-compose down && docker-compose up --build`) after editing `.env`. When the backend starts it logs the active SMTP host/port so you can confirm the configuration.
+
+Endpoints:
+
+- `POST /api/auth/password/forgot` accepts `{ "email": "employee@corp.com" }` and returns `202 Accepted` even if the email does not exist.
+- `POST /api/auth/password/reset` accepts `{ "token": "...","password":"NewPass12#","confirmPassword":"NewPass12#" }` and returns `204 No Content` when the password changes.
+
+The Angular application includes `/auth/forgot-password` and `/auth/reset-password` screens that mirror the same policy and surface feedback to the user.

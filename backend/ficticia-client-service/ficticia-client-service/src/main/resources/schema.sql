@@ -52,7 +52,9 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50)  NOT NULL UNIQUE,
     email    VARCHAR(150) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    enabled  TINYINT(1)   NOT NULL DEFAULT 1
+    enabled  TINYINT(1)   NOT NULL DEFAULT 1,
+    reset_token VARCHAR(120) NULL,
+    reset_token_expires_at DATETIME NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_roles (

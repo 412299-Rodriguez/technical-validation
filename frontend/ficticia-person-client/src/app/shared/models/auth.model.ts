@@ -36,3 +36,13 @@ export interface RegisterResponse {
   roles: string[];
   enabled: boolean;
 }
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  password: string;
+  confirmPassword: string;
+}

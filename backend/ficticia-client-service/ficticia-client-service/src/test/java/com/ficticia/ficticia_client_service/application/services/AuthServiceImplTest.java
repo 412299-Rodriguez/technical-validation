@@ -6,16 +6,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import com.ficticia.ficticia_client_service.api.dtos.ForgotPasswordRequest;
 import com.ficticia.ficticia_client_service.api.dtos.LoginRequest;
 import com.ficticia.ficticia_client_service.api.dtos.LoginResponse;
 import com.ficticia.ficticia_client_service.api.dtos.RegisterRequest;
 import com.ficticia.ficticia_client_service.api.dtos.RegisterResponse;
+import com.ficticia.ficticia_client_service.api.dtos.ResetPasswordRequest;
 import com.ficticia.ficticia_client_service.api.exception.BusinessException;
 import com.ficticia.ficticia_client_service.application.services.impl.AuthServiceImpl;
 import com.ficticia.ficticia_client_service.infrastructure.configs.JwtTokenProvider;
@@ -31,8 +35,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Unit tests for {@link AuthServiceImpl}.
@@ -54,6 +61,9 @@ class AuthServiceImplTest {
     @Mock
     private JwtTokenProvider jwtTokenProvider;
 
+    @Mock
+    private JavaMailSender mailSender;
+
     @InjectMocks
     private AuthServiceImpl authService;
 
@@ -73,6 +83,9 @@ class AuthServiceImplTest {
                 .password(STRONG_PASSWORD)
                 .confirmPassword(STRONG_PASSWORD)
                 .build();
+
+        ReflectionTestUtils.setField(authService, "frontendBaseUrl", "http://localhost:4200");
+        ReflectionTestUtils.setField(authService, "resetTokenMinutes", 60L);
     }
 
     @Test
@@ -220,6 +233,69 @@ class AuthServiceImplTest {
         assertThat(response.getRoles()).containsExactly("ROLE_USER");
         assertThat(response.isEnabled()).isTrue();
         verify(passwordEncoder).encode(STRONG_PASSWORD);
+    }
+
+    @Test
+    void requestPasswordResetShouldSendEmailWhenUserExists() {
+        ForgotPasswordRequest request = ForgotPasswordRequest.builder()
+                .email("user01@mail.com")
+                .build();
+        UserEntity user = userEntity(true, "encoded");
+        when(userRepository.findByEmailIgnoreCase("user01@mail.com")).thenReturn(Optional.of(user));
+        when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        authService.requestPasswordReset(request);
+
+        assertThat(user.getPasswordResetToken()).isNotBlank();
+        assertThat(user.getPasswordResetTokenExpiresAt()).isNotNull();
+        verify(mailSender, times(1)).send(any(SimpleMailMessage.class));
+    }
+
+    @Test
+    void requestPasswordResetShouldSilentlyIgnoreUnknownEmail() {
+        ForgotPasswordRequest request = ForgotPasswordRequest.builder()
+                .email("ghost@mail.com")
+                .build();
+        when(userRepository.findByEmailIgnoreCase("ghost@mail.com")).thenReturn(Optional.empty());
+
+        authService.requestPasswordReset(request);
+
+        verify(mailSender, never()).send(any(SimpleMailMessage.class));
+    }
+
+    @Test
+    void resetPasswordShouldFailWhenTokenUnknown() {
+        ResetPasswordRequest request = ResetPasswordRequest.builder()
+                .token("invalid-token")
+                .password(STRONG_PASSWORD)
+                .confirmPassword(STRONG_PASSWORD)
+                .build();
+        when(userRepository.findByPasswordResetToken("invalid-token")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> authService.resetPassword(request))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("Invalid or expired reset token");
+    }
+
+    @Test
+    void resetPasswordShouldUpdatePasswordWhenTokenValid() {
+        ResetPasswordRequest request = ResetPasswordRequest.builder()
+                .token("valid-token")
+                .password(STRONG_PASSWORD)
+                .confirmPassword(STRONG_PASSWORD)
+                .build();
+        UserEntity user = userEntity(true, "old");
+        user.setPasswordResetToken("valid-token");
+        user.setPasswordResetTokenExpiresAt(Instant.now().plusSeconds(600));
+        when(userRepository.findByPasswordResetToken("valid-token")).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(STRONG_PASSWORD)).thenReturn("encoded-new");
+        when(userRepository.save(user)).thenReturn(user);
+
+        authService.resetPassword(request);
+
+        assertThat(user.getPassword()).isEqualTo("encoded-new");
+        assertThat(user.getPasswordResetToken()).isNull();
+        assertThat(user.getPasswordResetTokenExpiresAt()).isNull();
     }
 
     private UserEntity userEntity(final boolean enabled, final String password) {

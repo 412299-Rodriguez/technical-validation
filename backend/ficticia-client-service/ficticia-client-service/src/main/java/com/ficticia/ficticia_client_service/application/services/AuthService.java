@@ -1,9 +1,11 @@
 package com.ficticia.ficticia_client_service.application.services;
 
+import com.ficticia.ficticia_client_service.api.dtos.ForgotPasswordRequest;
 import com.ficticia.ficticia_client_service.api.dtos.LoginRequest;
 import com.ficticia.ficticia_client_service.api.dtos.LoginResponse;
 import com.ficticia.ficticia_client_service.api.dtos.RegisterRequest;
 import com.ficticia.ficticia_client_service.api.dtos.RegisterResponse;
+import com.ficticia.ficticia_client_service.api.dtos.ResetPasswordRequest;
 
 /**
  * Defines authentication-related use cases.
@@ -25,4 +27,18 @@ public interface AuthService {
      * @return persisted user details
      */
     RegisterResponse register(RegisterRequest request);
+
+    /**
+     * Generates a password reset token and sends a mail to the provided email address.
+     *
+     * @param request request containing the employee email
+     */
+    void requestPasswordReset(ForgotPasswordRequest request);
+
+    /**
+     * Resets the password using a valid token.
+     *
+     * @param request request containing token and new password entries
+     */
+    void resetPassword(ResetPasswordRequest request);
 }

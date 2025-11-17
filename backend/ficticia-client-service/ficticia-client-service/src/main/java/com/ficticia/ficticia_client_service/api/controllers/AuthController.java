@@ -1,10 +1,12 @@
 package com.ficticia.ficticia_client_service.api.controllers;
 
 import com.ficticia.ficticia_client_service.api.dtos.ErrorResponse;
+import com.ficticia.ficticia_client_service.api.dtos.ForgotPasswordRequest;
 import com.ficticia.ficticia_client_service.api.dtos.LoginRequest;
 import com.ficticia.ficticia_client_service.api.dtos.LoginResponse;
 import com.ficticia.ficticia_client_service.api.dtos.RegisterRequest;
 import com.ficticia.ficticia_client_service.api.dtos.RegisterResponse;
+import com.ficticia.ficticia_client_service.api.dtos.ResetPasswordRequest;
 import com.ficticia.ficticia_client_service.application.services.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -86,5 +88,41 @@ public class AuthController {
     public ResponseEntity<RegisterResponse> register(@Valid @RequestBody final RegisterRequest registerRequest) {
         RegisterResponse response = authService.register(registerRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
+     * Sends the password reset instructions to the provided email address.
+     *
+     * @param request payload containing the employee email
+     * @return HTTP 202 response when the request was processed
+     */
+    @Operation(summary = "Request password reset", description = "Sends a tokenized link to reset the password.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Reset instructions sent"),
+            @ApiResponse(responseCode = "400", description = "Invalid email supplied",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/password/forgot")
+    public ResponseEntity<Void> requestPasswordReset(@Valid @RequestBody final ForgotPasswordRequest request) {
+        authService.requestPasswordReset(request);
+        return ResponseEntity.accepted().build();
+    }
+
+    /**
+     * Resets the password using a valid token.
+     *
+     * @param request payload containing token and new password values
+     * @return HTTP 204 response when the password has been updated
+     */
+    @Operation(summary = "Reset password", description = "Confirms the token and updates the account password.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Password updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid token or password",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/password/reset")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody final ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.noContent().build();
     }
 }
