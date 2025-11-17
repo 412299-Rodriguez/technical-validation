@@ -1,8 +1,11 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, ElementRef, ViewChild, AfterViewInit, inject, PLATFORM_ID, Inject, OnDestroy } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, inject, PLATFORM_ID, Inject, OnDestroy, OnInit, DestroyRef, ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SidebarComponent, SidebarLink } from '../../shared/components/sidebar/sidebar.component';
 import { CompanyBranding, DEFAULT_COMPANY_BRANDING } from '../../shared/models/branding.model';
+import { PersonService } from '../../core/services/person.service';
+import { PersonResponse } from '../../shared/models/person.model';
 
 // Lazy import Chart.js only in browser
 let Chart: any;
@@ -64,6 +67,17 @@ interface ConditionComparisonBucket {
   no: number;
 }
 
+interface DashboardAggregations {
+  total: number;
+  active: number;
+  inactive: number;
+  drivers: number;
+  glasses: number;
+  diabetics: number;
+  otherDiseases: number;
+  ageBuckets: AgeDistributionBucket[];
+}
+
 @Component({
   standalone: true,
   selector: 'app-home-page',
@@ -71,7 +85,7 @@ interface ConditionComparisonBucket {
   styleUrls: ['./home-page.component.css'],
   imports: [CommonModule, SidebarComponent]
 })
-export class HomePageComponent implements AfterViewInit, OnDestroy {
+export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
   /** Canvas reference for the pie chart instance. */
   @ViewChild('pieChartCanvas') pieChartCanvas?: ElementRef<HTMLCanvasElement>;
   /** Canvas reference for the bar chart instance. */
@@ -121,56 +135,142 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
   /** Metrics displayed on the summary cards. */
   metrics: DashboardMetric[] = [];
 
+  /** Raw dataset retrieved from the API. */
+  persons: PersonResponse[] = [];
+
   /** Data series used by the health factors pie chart. */
-  readonly healthFactorSlices: HealthFactorSlice[] = [
-    { label: 'Maneja', value: 4, color: '#8b5cf6' },
-    { label: 'Usa lentes', value: 3, color: '#6366f1' },
-    { label: 'Diabetico', value: 1, color: '#ec4899' },
-    { label: 'Otra enfermedad', value: 2, color: '#f97316' }
-  ];
+  healthFactorSlices: HealthFactorSlice[] = [];
 
   /** Data series used by the age distribution bar chart. */
-  readonly ageDistribution: AgeDistributionBucket[] = [
-    { label: '18-30', value: 1, color: '#60a5fa' },
-    { label: '31-40', value: 2, color: '#3b82f6' },
-    { label: '41-50', value: 1, color: '#2563eb' },
-    { label: '51-60', value: 1, color: '#1d4ed8' }
-  ];
+  ageDistribution: AgeDistributionBucket[] = [];
 
-  /** Mock dataset representing how many users are active vs inactive. */
-  readonly userStatusStats: UserStatusBucket[] = [
-    { label: 'Activos', value: 8 },
-    { label: 'Inactivos', value: 2 }
-  ];
+  /** Dataset representing how many users are active vs inactive. */
+  userStatusStats: UserStatusBucket[] = [];
 
   /** Comparison dataset that splits each condition between yes/no counts. */
-  readonly conditionComparison: ConditionComparisonBucket[] = [
-    { label: 'Maneja', yes: 4, no: 1 },
-    { label: 'Lentes', yes: 3, no: 2 },
-    { label: 'Diabético', yes: 1, no: 4 },
-    { label: 'Otras enf.', yes: 2, no: 3 }
-  ];
+  conditionComparison: ConditionComparisonBucket[] = [];
 
   /** Sanitizer used to safely project SVG icons into the DOM. */
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly personService = inject(PersonService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private viewInitialized = false;
 
   /**
-   * Build the metrics dataset as soon as the component is created.
+   * Build initial datasets as soon as the component is created.
    */
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    this.initializeMetrics();
+    this.rebuildDashboardData();
   }
 
-  /**
-   * Prepares the metric cards list and stores the sanitized SVG icon for each one.
-   */
-  private initializeMetrics(): void {
+  ngOnInit(): void {
+    this.loadPersons();
+  }
+
+  private loadPersons(): void {
+    this.personService
+      .getPersons()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (persons) => {
+          this.persons = Array.isArray(persons) ? persons : [];
+          this.rebuildDashboardData();
+        },
+        error: (error) => {
+          console.error('Failed to load persons for dashboard', error);
+          this.persons = [];
+          this.rebuildDashboardData();
+        }
+      });
+  }
+
+  private rebuildDashboardData(): void {
+    const stats = this.computeAggregations();
+    this.metrics = this.buildMetrics(stats);
+    this.healthFactorSlices = this.buildHealthFactorSlices(stats);
+    this.ageDistribution = stats.ageBuckets;
+    this.userStatusStats = this.buildUserStatusStats(stats);
+    this.conditionComparison = this.buildConditionComparison(stats);
+    this.updateCharts();
+    this.detectChanges();
+  }
+
+  private computeAggregations(): DashboardAggregations {
+    const ageBuckets: AgeDistributionBucket[] = [
+      { label: '18-30', value: 0, color: '#60a5fa' },
+      { label: '31-40', value: 0, color: '#3b82f6' },
+      { label: '41-50', value: 0, color: '#2563eb' },
+      { label: '51-60', value: 0, color: '#1d4ed8' }
+    ];
+
+    let active = 0;
+    let drivers = 0;
+    let glasses = 0;
+    let diabetics = 0;
+    let otherDiseases = 0;
+
+    for (const person of this.persons) {
+      if (person.active) {
+        active++;
+      }
+      if (person.drives) {
+        drivers++;
+      }
+      if (person.wearsGlasses) {
+        glasses++;
+      }
+      if (person.diabetic) {
+        diabetics++;
+      }
+      if (person.otherDisease) {
+        otherDiseases++;
+      }
+      this.assignAgeToBucket(person.age, ageBuckets);
+    }
+
+    const total = this.persons.length;
+
+    return {
+      total,
+      active,
+      inactive: Math.max(total - active, 0),
+      drivers,
+      glasses,
+      diabetics,
+      otherDiseases,
+      ageBuckets
+    };
+  }
+
+  private assignAgeToBucket(age: number, buckets: AgeDistributionBucket[]): void {
+    if (!Number.isFinite(age) || buckets.length === 0) {
+      return;
+    }
+
+    if (age <= 30) {
+      buckets[0].value++;
+      return;
+    }
+    if (age <= 40) {
+      buckets[1].value++;
+      return;
+    }
+    if (age <= 50) {
+      buckets[2].value++;
+      return;
+    }
+    buckets[3].value++;
+  }
+
+  private buildMetrics(stats: DashboardAggregations): DashboardMetric[] {
+    const total = stats.total;
     const rawMetrics: DashboardMetric[] = [
       {
         id: 'total',
         label: 'Clientes totales',
-        value: 5,
-        subtitle: 'Activos en el sistema',
+        value: total,
+        subtitle: `${stats.active} activos en el sistema`,
         accentColorClass: 'bg-blue-100 text-blue-700',
         iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
@@ -182,8 +282,8 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
       {
         id: 'drivers',
         label: 'Manejan',
-        value: 4,
-        subtitle: '80% de los clientes',
+        value: stats.drivers,
+        subtitle: `${this.calculatePercentage(stats.drivers, total)}% de los clientes`,
         accentColorClass: 'bg-emerald-100 text-emerald-700',
         iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
@@ -193,8 +293,8 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
       {
         id: 'glasses',
         label: 'Usan Lentes',
-        value: 3,
-        subtitle: '60% de los clientes',
+        value: stats.glasses,
+        subtitle: `${this.calculatePercentage(stats.glasses, total)}% de los clientes`,
         accentColorClass: 'bg-purple-100 text-purple-700',
         iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="6" cy="15" r="4"/>
@@ -207,8 +307,8 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
       {
         id: 'diabetes',
         label: 'Diabeticos',
-        value: 1,
-        subtitle: '20% de los clientes',
+        value: stats.diabetics,
+        subtitle: `${this.calculatePercentage(stats.diabetics, total)}% de los clientes`,
         accentColorClass: 'bg-rose-100 text-rose-700',
         iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -216,16 +316,95 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
       }
     ];
 
-    this.metrics = rawMetrics.map(metric => ({
+    return rawMetrics.map(metric => ({
       ...metric,
       safeIconSvg: this.sanitizer.bypassSecurityTrustHtml(metric.iconSvg)
     }));
+  }
+
+  private buildHealthFactorSlices(stats: DashboardAggregations): HealthFactorSlice[] {
+    return [
+      { label: 'Maneja', value: stats.drivers, color: '#8b5cf6' },
+      { label: 'Usa lentes', value: stats.glasses, color: '#6366f1' },
+      { label: 'Diabetico', value: stats.diabetics, color: '#ec4899' },
+      { label: 'Otra enfermedad', value: stats.otherDiseases, color: '#f97316' }
+    ];
+  }
+
+  private buildUserStatusStats(stats: DashboardAggregations): UserStatusBucket[] {
+    return [
+      { label: 'Activos', value: stats.active },
+      { label: 'Inactivos', value: stats.inactive }
+    ];
+  }
+
+  private buildConditionComparison(stats: DashboardAggregations): ConditionComparisonBucket[] {
+    const total = stats.total;
+    const noValue = (yes: number) => Math.max(total - yes, 0);
+    return [
+      { label: 'Maneja', yes: stats.drivers, no: noValue(stats.drivers) },
+      { label: 'Lentes', yes: stats.glasses, no: noValue(stats.glasses) },
+      { label: 'Diabetico', yes: stats.diabetics, no: noValue(stats.diabetics) },
+      { label: 'Otras enf.', yes: stats.otherDiseases, no: noValue(stats.otherDiseases) }
+    ];
+  }
+
+  private calculatePercentage(value: number, total: number): number {
+    if (total === 0) {
+      return 0;
+    }
+    return Math.round((value / total) * 100);
+  }
+
+  private updateCharts(): void {
+    if (this.pieChart) {
+      this.pieChart.data.labels = this.healthFactorSlices.map(slice => slice.label);
+      this.pieChart.data.datasets[0].data = this.healthFactorSlices.map(slice => slice.value);
+      this.pieChart.data.datasets[0].backgroundColor = this.healthFactorSlices.map(slice => slice.color);
+      this.pieChart.update();
+    }
+
+    if (this.barChart) {
+      this.barChart.data.labels = this.ageDistribution.map(bucket => bucket.label);
+      this.barChart.data.datasets[0].data = this.ageDistribution.map(bucket => bucket.value);
+      this.barChart.update();
+    }
+
+    if (this.userStatusChart) {
+      this.userStatusChart.data.labels = this.userStatusStats.map(bucket => bucket.label);
+      this.userStatusChart.data.datasets[0].data = this.userStatusStats.map(bucket => bucket.value);
+      this.userStatusChart.update();
+    }
+
+    if (this.comparisonChart) {
+      this.comparisonChart.data.labels = this.conditionComparison.map(item => item.label);
+      if (this.comparisonChart.data.datasets[0]) {
+        this.comparisonChart.data.datasets[0].data = this.conditionComparison.map(item => item.no);
+      }
+      if (this.comparisonChart.data.datasets[1]) {
+        this.comparisonChart.data.datasets[1].data = this.conditionComparison.map(item => item.yes);
+      }
+      this.comparisonChart.update();
+    }
+  }
+
+  private detectChanges(): void {
+    if (!this.viewInitialized || (this.cdr as any)?.destroyed) {
+      return;
+    }
+
+    queueMicrotask(() => {
+      if (!(this.cdr as any)?.destroyed) {
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   /**
    * When charts are part of the DOM, lazily instantiate them once Chart.js is registered.
    */
   ngAfterViewInit(): void {
+    this.viewInitialized = true;
     if (isPlatformBrowser(this.platformId)) {
       const checkChart = setInterval(() => {
         if (Chart) {
@@ -234,9 +413,11 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
           this.initializeBarChart();
           this.initializeUserStatusChart();
           this.initializeConditionComparisonChart();
+          this.detectChanges();
         }
       }, 100);
     }
+    this.detectChanges();
   }
 
   /**
@@ -464,3 +645,5 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
     }
   }
 }
+
+
