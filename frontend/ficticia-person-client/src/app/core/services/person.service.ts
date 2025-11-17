@@ -25,4 +25,11 @@ export class PersonService {
   updatePerson(id: number, payload: PersonPayload): Observable<PersonResponse> {
     return this.http.put<PersonResponse>(`${this.resourceUrl}/${id}`, payload);
   }
+
+  /**
+   * Creates a new person.
+   */
+  createPerson(payload: PersonPayload): Observable<PersonResponse> {
+    return this.http.post<PersonResponse>(this.resourceUrl, payload);
+  }
 }

@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
+import { Component, DestroyRef, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { SidebarComponent, SidebarLink } from '../../shared/components/sidebar/sidebar.component';
 import { ClientsListComponent } from './clients-list/clients-list.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
@@ -30,7 +30,7 @@ import { finalize } from 'rxjs';
   templateUrl: './clients-page.component.html',
   styleUrls: ['./clients-page.component.css']
 })
-export class ClientsPageComponent implements OnInit {
+export class ClientsPageComponent implements OnInit, OnDestroy {
   /** Company branding shared with navbar/sidebar. */
   readonly sidebarBranding: CompanyBranding = DEFAULT_COMPANY_BRANDING;
 
@@ -77,9 +77,15 @@ export class ClientsPageComponent implements OnInit {
 
   private readonly personService = inject(PersonService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly document = inject(DOCUMENT);
 
   ngOnInit(): void {
+    this.enableBodyScroll();
     this.loadClients();
+  }
+
+  ngOnDestroy(): void {
+    this.restoreBodyScroll();
   }
 
   private loadClients(): void {
@@ -101,6 +107,18 @@ export class ClientsPageComponent implements OnInit {
           this.loadError.set('No pudimos obtener la lista de clientes. Intenta nuevamente.');
         }
       });
+  }
+
+  private enableBodyScroll(): void {
+    const htmlElement = this.document.documentElement;
+    htmlElement.style.overflow = 'auto';
+    this.document.body.style.overflow = 'auto';
+  }
+
+  private restoreBodyScroll(): void {
+    const htmlElement = this.document.documentElement;
+    htmlElement.style.overflow = '';
+    this.document.body.style.overflow = '';
   }
 
   openCreateModal(): void {
@@ -126,15 +144,36 @@ export class ClientsPageComponent implements OnInit {
   }
 
   handleFormSubmit(payload: PersonPayload): void {
-    if (this.modalMode !== 'edit' || !this.selectedClient) {
-      console.warn('Create operation not implemented yet.');
+    this.saving.set(true);
+
+    if (this.modalMode === 'edit' && this.selectedClient) {
+      this.personService
+        .updatePerson(this.selectedClient.id, payload)
+        .pipe(
+          takeUntilDestroyed(this.destroyRef),
+          finalize(() => {
+            this.saving.set(false);
+          })
+        )
+        .subscribe({
+          next: (updated) => {
+            this.clients.update((list) =>
+              list.map((client) => (client.id === updated.id ? updated : client))
+            );
+            this.selectedClient = updated;
+            this.feedbackState.set({
+              type: 'success',
+              title: 'Cliente actualizado',
+              message: `${updated.fullName} fue actualizado correctamente.`
+            });
+          },
+          error: (error: HttpErrorResponse) => this.handleSaveError(error)
+        });
       return;
     }
 
-    this.saving.set(true);
-
     this.personService
-      .updatePerson(this.selectedClient.id, payload)
+      .createPerson(payload)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
@@ -142,31 +181,31 @@ export class ClientsPageComponent implements OnInit {
         })
       )
       .subscribe({
-        next: (updated) => {
-          this.clients.update((list) =>
-            list.map((client) => (client.id === updated.id ? updated : client))
-          );
-          this.selectedClient = updated;
+        next: (created) => {
+          this.clients.update((list) => [created, ...list]);
+          this.selectedClient = created;
           this.feedbackState.set({
             type: 'success',
-            title: 'Cliente actualizado',
-            message: `${updated.fullName} fue actualizado correctamente.`
+            title: 'Cliente creado',
+            message: `${created.fullName} fue agregado correctamente.`
           });
         },
-        error: (error: HttpErrorResponse) => {
-          const isValidationIssue = error.status >= 400 && error.status < 500;
-          const message =
-            error.error?.message ??
-            (isValidationIssue
-              ? 'Revisa la información ingresada e intenta nuevamente.'
-              : 'No pudimos actualizar al cliente. Intenta nuevamente más tarde.');
-          this.feedbackState.set({
-            type: isValidationIssue ? 'warning' : 'error',
-            title: isValidationIssue ? 'Revisa los datos' : 'Error inesperado',
-            message
-          });
-        }
+        error: (error: HttpErrorResponse) => this.handleSaveError(error)
       });
+  }
+
+  private handleSaveError(error: HttpErrorResponse): void {
+    const isValidationIssue = error.status >= 400 && error.status < 500;
+    const message =
+      error.error?.message ??
+      (isValidationIssue
+        ? 'Revisa la información ingresada e intenta nuevamente.'
+        : 'No pudimos procesar la solicitud. Intenta nuevamente más tarde.');
+    this.feedbackState.set({
+      type: isValidationIssue ? 'warning' : 'error',
+      title: isValidationIssue ? 'Revisa los datos' : 'Error inesperado',
+      message
+    });
   }
 
   onFeedbackClose(): void {
