@@ -37,9 +37,11 @@
     "express": "^5.1.0",
     "primeng": "^20.3.0",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "zone.js": "^0.15.1"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "^20.3.10",
     "@angular/build": "^20.3.10",
     "@angular/cdk": "^20.2.13",
     "@angular/cli": "^20.3.10",
