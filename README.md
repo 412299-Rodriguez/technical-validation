@@ -164,7 +164,18 @@ Typical `.env` scenarios:
    ```
    Inspect messages at `http://localhost:8025`.
 
-2. **Gmail / Mailtrap / Provider with TLS**  
+2. **Mailtrap sandbox (recommended for inbox-like testing)**  
+   ```
+   MAIL_HOST=smtp.mailtrap.io
+   MAIL_PORT=2525
+   MAIL_USERNAME=<your mailtrap user>
+   MAIL_PASSWORD=<your mailtrap password>
+   MAIL_SMTP_AUTH=true
+   MAIL_SMTP_STARTTLS=true
+   ```
+   Copy the credentials from your Mailtrap inbox settings and rerun Docker. Messages will appear in the Mailtrap UI.
+
+3. **Gmail / other providers with TLS**  
    ```
    MAIL_HOST=smtp.gmail.com
    MAIL_PORT=587
