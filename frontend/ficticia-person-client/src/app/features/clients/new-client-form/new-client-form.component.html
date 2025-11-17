@@ -1,7 +1,7 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
   <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
     <div>
-      <label class="mb-1 block text-sm font-medium text-slate-700">Full Name</label>
+      <label class="mb-1 block text-sm font-medium text-slate-700">Nombre completo</label>
       <input
         type="text"
         formControlName="fullName"
@@ -11,7 +11,7 @@
     </div>
 
     <div>
-      <label class="mb-1 block text-sm font-medium text-slate-700">Identification</label>
+      <label class="mb-1 block text-sm font-medium text-slate-700">Identificación</label>
       <input
         type="text"
         formControlName="identification"
@@ -21,7 +21,7 @@
     </div>
 
     <div>
-      <label class="mb-1 block text-sm font-medium text-slate-700">Age</label>
+      <label class="mb-1 block text-sm font-medium text-slate-700">Edad</label>
       <input
         type="number"
         formControlName="age"
@@ -31,14 +31,14 @@
     </div>
 
     <div>
-      <label class="mb-1 block text-sm font-medium text-slate-700">Gender</label>
+      <label class="mb-1 block text-sm font-medium text-slate-700">Género</label>
       <select
         formControlName="gender"
       class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
-        <option value="" disabled>Select</option>
-        <option value="MALE">Male</option>
-        <option value="FEMALE">Female</option>
-        <option value="OTHER">Other</option>
+        <option value="" disabled>Selecciona</option>
+        <option value="MALE">Masculino</option>
+        <option value="FEMALE">Femenino</option>
+        <option value="OTHER">Otro</option>
       </select>
     </div>
   </div>
@@ -47,7 +47,7 @@
 
   <div class="space-y-4">
     <label class="flex items-center justify-between text-sm font-medium text-slate-700">
-      <span>Active</span>
+      <span>Activo</span>
       <div class="flex items-center">
         <input type="checkbox" id="activeToggle" formControlName="active" class="peer sr-only" />
         <span
@@ -58,7 +58,7 @@
     </label>
 
     <label class="flex items-center justify-between text-sm font-medium text-slate-700">
-      <span>Drives?</span>
+      <span>¿Maneja?</span>
       <div class="flex items-center">
         <input type="checkbox" id="drivesToggle" formControlName="drives" class="peer sr-only" />
         <span
@@ -69,7 +69,7 @@
     </label>
 
     <label class="flex items-center justify-between text-sm font-medium text-slate-700">
-      <span>Wears Glasses?</span>
+      <span>¿Utiliza lentes?</span>
       <div class="flex items-center">
         <input type="checkbox" id="glassesToggle" formControlName="wearsGlasses" class="peer sr-only" />
         <span
@@ -80,7 +80,7 @@
     </label>
 
     <label class="flex items-center justify-between text-sm font-medium text-slate-700">
-      <span>Diabetic?</span>
+      <span>¿Es diabetico?</span>
       <div class="flex items-center">
         <input type="checkbox" id="diabeticToggle" formControlName="diabetic" class="peer sr-only" />
         <span
@@ -94,25 +94,25 @@
   <hr class="border-slate-200" />
 
   <div>
-    <label class="mb-1 block text-sm font-medium text-slate-700">Other Disease (if any)</label>
+    <label class="mb-1 block text-sm font-medium text-slate-700">Otra enfermedad (opcional)</label>
     <textarea
       rows="3"
       formControlName="otherDisease"
-      placeholder="Describe any other disease..."
+      placeholder="Describe cualquier otra condición médica relevante..."
       class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"></textarea>
   </div>
 
   <div class="flex items-center justify-between">
     <div>
-      <p class="text-sm font-medium text-slate-700">Additional Attributes</p>
-      <p class="text-xs text-slate-400">Optional metadata to send to the API.</p>
+      <p class="text-sm font-medium text-slate-700">Atributos adicionales (opcional)</p>
+      <p class="text-xs text-slate-400">Ingrese atributos</p>
     </div>
     <button
       type="button"
       class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
       (click)="onAddAttribute()">
       <span class="mr-1 text-base">+</span>
-      Add
+      Agregar
     </button>
   </div>
 
@@ -124,12 +124,12 @@
       <input
         type="text"
         class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        placeholder="Key"
+        placeholder="Nombre del atributo"
         formControlName="key" />
       <input
         type="text"
         class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        placeholder="Value"
+        placeholder="Descripción breve"
         formControlName="value" />
       <button
         type="button"
@@ -146,12 +146,12 @@
       type="button"
       (click)="onCancel()"
       class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-      Cancel
+      Cancelar
     </button>
     <button
       type="submit"
       class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
-      {{ mode === 'create' ? 'Create Client' : 'Save Changes' }}
+      {{ mode === 'create' ? 'Crear cliente' : 'Guardar cambios' }}
     </button>
   </div>
 </form>

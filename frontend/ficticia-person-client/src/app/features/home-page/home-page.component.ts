@@ -168,7 +168,7 @@ export class HomePageComponent implements AfterViewInit, OnDestroy {
     const rawMetrics: DashboardMetric[] = [
       {
         id: 'total',
-        label: 'Total Clients',
+        label: 'Clientes totales',
         value: 5,
         subtitle: 'Activos en el sistema',
         accentColorClass: 'bg-blue-100 text-blue-700',

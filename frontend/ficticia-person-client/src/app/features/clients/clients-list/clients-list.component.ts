@@ -32,13 +32,16 @@ export class ClientsListComponent {
    * Returns the dataset filtered by the search term and the status selector.
    */
   get filteredClients(): PersonResponse[] {
-    const normalizedTerm = this.searchTerm.trim().toLowerCase();
+    const normalizedTerm = this.normalizeText(this.searchTerm);
 
     return this.clients.filter((client) => {
+      const normalizedFullName = this.normalizeText(client.fullName);
+      const normalizedIdentification = this.normalizeText(client.identification);
+
       const matchesSearch =
         normalizedTerm.length === 0 ||
-        client.fullName.toLowerCase().includes(normalizedTerm) ||
-        client.identification.toLowerCase().includes(normalizedTerm);
+        normalizedFullName.includes(normalizedTerm) ||
+        normalizedIdentification.includes(normalizedTerm);
 
       const matchesStatus =
         this.statusFilter === 'ALL' ||
@@ -61,5 +64,15 @@ export class ClientsListComponent {
    */
   onEditClient(client: PersonResponse): void {
     this.editClient.emit(client);
+  }
+
+  /**
+   * Normalizes diacritics and casing so text comparisons are accent/case insensitive.
+   */
+  private normalizeText(value?: string | null): string {
+    return (value ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
   }
 }
