@@ -1,0 +1,64 @@
+<div class="w-full h-full flex items-center justify-center">
+  <section class="w-full max-w-md rounded-2xl bg-white px-8 py-6 text-center border border-slate-100">
+    <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full" [ngClass]="iconContainerClass">
+      <svg
+        class="h-7 w-7"
+        [ngClass]="iconColorClass"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true">
+        <ng-container [ngSwitch]="type">
+          <g *ngSwitchCase="'success'">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9 12l2 2 4-4"></path>
+          </g>
+          <g *ngSwitchCase="'error'">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M15 9l-6 6"></path>
+            <path d="M9 9l6 6"></path>
+          </g>
+          <g *ngSwitchCase="'warning'">
+            <path d="M12 2 2 22h20L12 2z"></path>
+            <path d="M12 9v4"></path>
+            <path d="M12 17h.01"></path>
+          </g>
+          <g *ngSwitchDefault>
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 16v-4"></path>
+            <path d="M12 8h.01"></path>
+          </g>
+        </ng-container>
+      </svg>
+    </div>
+
+    <h2 class="text-lg font-semibold mb-1" [ngClass]="titleColorClass">
+      {{ title }}
+    </h2>
+
+    <p class="text-sm text-slate-500 mb-6">
+      {{ message }}
+    </p>
+
+    <div class="flex flex-col gap-2 sm:flex-row sm:justify-center">
+      <button
+        type="button"
+        (click)="onPrimaryClick()"
+        class="inline-flex justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+        {{ primaryButtonLabel }}
+      </button>
+
+      <button
+        *ngIf="secondaryButtonLabel"
+        type="button"
+        (click)="onSecondaryClick()"
+        class="inline-flex justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+        {{ secondaryButtonLabel }}
+      </button>
+    </div>
+  </section>
+</div>
