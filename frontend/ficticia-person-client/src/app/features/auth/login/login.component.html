@@ -1,5 +1,5 @@
-﻿<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-50 to-slate-100 px-4">
-  <div class="bg-white rounded-3xl shadow-xl px-10 py-12 w-full max-w-md">
+<div class="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-50 to-slate-100 px-4">
+  <div class="bg-white rounded-3xl shadow-xl px-10 py-12 w-full max-w-md relative z-10">
     <div class="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center mx-auto mb-6 text-white">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l6 2v5.5c0 4.28-2.99 8.22-6 9.5-3.01-1.28-6-5.22-6-9.5V5l6-2z" />
@@ -25,7 +25,6 @@
         {{ isSubmitting ? 'Ingresando...' : 'Ingresar' }}
       </button>
 
-      <p *ngIf="errorMessage" class="text-center text-sm text-red-600">{{ errorMessage }}</p>
     </form>
 
     <p class="mt-4 text-center text-sm text-slate-600">
@@ -33,5 +32,16 @@
       <a routerLink="/auth/register" class="text-blue-600 hover:text-blue-700 font-medium">Registrarse</a>
     </p>
     <p class="mt-6 text-center text-xs text-slate-400">Uso autorizado para empleados</p>
+  </div>
+
+  <div *ngIf="feedbackState" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40"></div>
+  <div *ngIf="feedbackState" class="fixed inset-0 z-50 flex items-center justify-center px-4">
+    <app-feedback-panel
+      [type]="feedbackState?.type ?? 'error'"
+      [title]="feedbackState?.title ?? ''"
+      [message]="feedbackState?.message ?? ''"
+      primaryButtonLabel="Cerrar"
+      (primaryAction)="onFeedbackClose()">
+    </app-feedback-panel>
   </div>
 </div>
