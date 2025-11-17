@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ficticia.ficticia_client_service.api.dtos.LoginRequest;
 import com.ficticia.ficticia_client_service.api.dtos.LoginResponse;
-import com.ficticia.ficticia_client_service.api.dtos.auth.RegisterRequest;
-import com.ficticia.ficticia_client_service.api.dtos.auth.RegisterResponse;
+import com.ficticia.ficticia_client_service.api.dtos.RegisterRequest;
+import com.ficticia.ficticia_client_service.api.dtos.RegisterResponse;
 import com.ficticia.ficticia_client_service.api.exception.BusinessException;
 import com.ficticia.ficticia_client_service.application.services.AuthService;
 import com.ficticia.ficticia_client_service.infrastructure.configs.JwtTokenProvider;

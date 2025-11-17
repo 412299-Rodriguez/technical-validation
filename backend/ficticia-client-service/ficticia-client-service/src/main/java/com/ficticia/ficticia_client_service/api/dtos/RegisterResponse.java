@@ -1,4 +1,4 @@
-package com.ficticia.ficticia_client_service.api.dtos.auth;
+package com.ficticia.ficticia_client_service.api.dtos;
 
 import java.util.List;
 

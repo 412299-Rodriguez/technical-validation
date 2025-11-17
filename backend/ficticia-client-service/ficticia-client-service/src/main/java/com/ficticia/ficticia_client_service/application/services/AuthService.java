@@ -2,8 +2,8 @@ package com.ficticia.ficticia_client_service.application.services;
 
 import com.ficticia.ficticia_client_service.api.dtos.LoginRequest;
 import com.ficticia.ficticia_client_service.api.dtos.LoginResponse;
-import com.ficticia.ficticia_client_service.api.dtos.auth.RegisterRequest;
-import com.ficticia.ficticia_client_service.api.dtos.auth.RegisterResponse;
+import com.ficticia.ficticia_client_service.api.dtos.RegisterRequest;
+import com.ficticia.ficticia_client_service.api.dtos.RegisterResponse;
 
 /**
  * Defines authentication-related use cases.
