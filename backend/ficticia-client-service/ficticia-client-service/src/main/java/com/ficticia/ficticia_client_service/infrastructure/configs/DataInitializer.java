@@ -31,10 +31,8 @@ public class DataInitializer {
     @Bean
     CommandLineRunner initData() {
         return args -> {
-            RoleEntity adminRole = roleRepository.findByName("ROLE_ADMIN")
-                    .orElseGet(() -> roleRepository.save(RoleEntity.builder()
-                            .name("ROLE_ADMIN")
-                            .build()));
+            RoleEntity adminRole = ensureRoleExists("ROLE_ADMIN");
+            ensureRoleExists("ROLE_USER");
 
             userRepository.findByUsername("admin").orElseGet(() -> {
                 UserEntity admin = UserEntity.builder()
@@ -46,5 +44,12 @@ public class DataInitializer {
                 return userRepository.save(admin);
             });
         };
+    }
+
+    private RoleEntity ensureRoleExists(final String roleName) {
+        return roleRepository.findByName(roleName)
+                .orElseGet(() -> roleRepository.save(RoleEntity.builder()
+                        .name(roleName)
+                        .build()));
     }
 }

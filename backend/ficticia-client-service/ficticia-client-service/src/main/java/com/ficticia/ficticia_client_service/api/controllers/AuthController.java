@@ -3,6 +3,8 @@ package com.ficticia.ficticia_client_service.api.controllers;
 import com.ficticia.ficticia_client_service.api.dtos.ErrorResponse;
 import com.ficticia.ficticia_client_service.api.dtos.LoginRequest;
 import com.ficticia.ficticia_client_service.api.dtos.LoginResponse;
+import com.ficticia.ficticia_client_service.api.dtos.auth.RegisterRequest;
+import com.ficticia.ficticia_client_service.api.dtos.auth.RegisterResponse;
 import com.ficticia.ficticia_client_service.application.services.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,5 +61,28 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody final LoginRequest loginRequest) {
         LoginResponse response = authService.login(loginRequest);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Registers a new user account with a default role.
+     *
+     * @param registerRequest registration payload
+     * @return HTTP 201 response containing the created user summary
+     */
+    @Operation(summary = "Register user", description = "Creates a new user with a default role when validation succeeds")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User registered",
+                    content = @Content(schema = @Schema(implementation = RegisterResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid payload supplied",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "Username already exists",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody final RegisterRequest registerRequest) {
+        RegisterResponse response = authService.register(registerRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

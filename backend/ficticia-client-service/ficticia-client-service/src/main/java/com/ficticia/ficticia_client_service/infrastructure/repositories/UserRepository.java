@@ -20,4 +20,12 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
      * @return optional user
      */
     Optional<UserEntity> findByUsername(String username);
+
+    /**
+     * Loads a user by username ignoring case sensitivity.
+     *
+     * @param username username to lookup
+     * @return optional user
+     */
+    Optional<UserEntity> findByUsernameIgnoreCase(String username);
 }
