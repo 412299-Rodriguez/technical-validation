@@ -34,12 +34,12 @@
     <p class="mt-6 text-center text-xs text-slate-400">Uso autorizado para empleados</p>
   </div>
 
-  <div *ngIf="feedbackState" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40"></div>
-  <div *ngIf="feedbackState" class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <div *ngIf="feedbackState()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40"></div>
+  <div *ngIf="feedbackState()" class="fixed inset-0 z-50 flex items-center justify-center px-4">
     <app-feedback-panel
-      [type]="feedbackState?.type ?? 'error'"
-      [title]="feedbackState?.title ?? ''"
-      [message]="feedbackState?.message ?? ''"
+      [type]="feedbackState()?.type ?? 'error'"
+      [title]="feedbackState()?.title ?? ''"
+      [message]="feedbackState()?.message ?? ''"
       primaryButtonLabel="Cerrar"
       (primaryAction)="onFeedbackClose()">
     </app-feedback-panel>

@@ -2,7 +2,7 @@
  * Login screen component that renders the reactive form and handles submit UX state.
  */
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { FormFieldErrorComponent } from '../../../shared/components/form-field-error/form-field-error.component';
@@ -28,11 +28,11 @@ export class LoginComponent {
   readonly form: LoginForm;
 
   isSubmitting = false;
-  feedbackState: {
+  feedbackState = signal<{
     type: 'success' | 'warning' | 'error';
     title: string;
     message: string;
-  } | null = null;
+  } | null>(null);
 
   constructor(
     private readonly fb: FormBuilder,
@@ -54,7 +54,7 @@ export class LoginComponent {
     }
 
     this.isSubmitting = true;
-    this.feedbackState = null;
+    this.feedbackState.set(null);
 
     this.authService
       .login(this.form.getRawValue())
@@ -67,35 +67,35 @@ export class LoginComponent {
 
   private handleError(error: HttpErrorResponse): void {
     if (error.status === 400 || error.status === 403) {
-      this.feedbackState = {
+      this.feedbackState.set({
         type: 'warning',
         title: 'Credenciales inválidas',
         message: 'Verifica usuario y contraseña e inténtalo de nuevo.'
-      };
+      });
       this.cdr.detectChanges();
       return;
     }
 
     if (error.status >= 500) {
-      this.feedbackState = {
+      this.feedbackState.set({
         type: 'error',
         title: 'Error del servidor',
         message: 'El servicio no responde en este momento. Intenta nuevamente más tarde.'
-      };
+      });
       this.cdr.detectChanges();
       return;
     }
 
-    this.feedbackState = {
+    this.feedbackState.set({
       type: 'error',
       title: 'Inicio de sesión fallido',
       message: error.error?.message ?? 'Ocurrió un error inesperado. Intenta otra vez.'
-    };
+    });
     this.cdr.detectChanges();
   }
 
   onFeedbackClose(): void {
-    this.feedbackState = null;
+    this.feedbackState.set(null);
     this.cdr.detectChanges();
   }
 }

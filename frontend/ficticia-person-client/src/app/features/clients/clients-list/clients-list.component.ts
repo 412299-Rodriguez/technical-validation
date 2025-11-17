@@ -27,6 +27,8 @@ export class ClientsListComponent {
 
   /** Current status filter. */
   statusFilter: 'ALL' | 'ACTIVE' | 'INACTIVE' = 'ALL';
+  /** Current sort direction applied to the ID column (newest vs oldest). */
+  sortDirection: 'asc' | 'desc' = 'desc';
 
   /**
    * Returns the dataset filtered by the search term and the status selector.
@@ -34,7 +36,7 @@ export class ClientsListComponent {
   get filteredClients(): PersonResponse[] {
     const normalizedTerm = this.normalizeText(this.searchTerm);
 
-    return this.clients.filter((client) => {
+    const filtered = this.clients.filter((client) => {
       const normalizedFullName = this.normalizeText(client.fullName);
       const normalizedIdentification = this.normalizeText(client.identification);
 
@@ -50,6 +52,12 @@ export class ClientsListComponent {
 
       return matchesSearch && matchesStatus;
     });
+
+    return filtered.slice().sort((a, b) => {
+      const aId = Number(a.id) || 0;
+      const bId = Number(b.id) || 0;
+      return this.sortDirection === 'desc' ? bId - aId : aId - bId;
+    });
   }
 
   /**
@@ -64,6 +72,10 @@ export class ClientsListComponent {
    */
   onEditClient(client: PersonResponse): void {
     this.editClient.emit(client);
+  }
+
+  toggleSortDirection(): void {
+    this.sortDirection = this.sortDirection === 'desc' ? 'asc' : 'desc';
   }
 
   /**
