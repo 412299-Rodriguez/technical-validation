@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
+import { ClientsPageComponent } from './features/clients/clients-page.component';
 
 export const routes: Routes = [
   {
@@ -40,8 +41,7 @@ export const routes: Routes = [
       },
       {
         path: 'clients',
-        loadComponent: () =>
-          import('./features/clients/clients-page.component').then((m) => m.ClientsPageComponent)
+        component: ClientsPageComponent
       }
     ]
   },

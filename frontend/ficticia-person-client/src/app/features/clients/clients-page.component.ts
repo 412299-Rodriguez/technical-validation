@@ -1,15 +1,17 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { ClientsListComponent } from './clients-list/clients-list.component';
-import { PersonResponse } from '../../shared/models/person.model';
+import { CommonModule, DOCUMENT } from '@angular/common';
+import { Component, DestroyRef, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { SidebarComponent, SidebarLink } from '../../shared/components/sidebar/sidebar.component';
-import { CompanyBranding, DEFAULT_COMPANY_BRANDING } from '../../shared/models/branding.model';
+import { ClientsListComponent } from './clients-list/clients-list.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { NewClientFormComponent } from './new-client-form/new-client-form.component';
+import { CompanyBranding, DEFAULT_COMPANY_BRANDING } from '../../shared/models/branding.model';
+import { PersonResponse } from '../../shared/models/person.model';
+import { PersonService } from '../../core/services/person.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Page-level container that wires navbar, sidebar and the clients list view.
- * Provides mocked data and layout structure for the Clients section.
+ * Fetches the real client dataset before rendering the list.
  */
 @Component({
   standalone: true,
@@ -18,7 +20,7 @@ import { NewClientFormComponent } from './new-client-form/new-client-form.compon
   templateUrl: './clients-page.component.html',
   styleUrls: ['./clients-page.component.css']
 })
-export class ClientsPageComponent {
+export class ClientsPageComponent implements OnInit, OnDestroy {
   /** Company branding shared with navbar/sidebar. */
   readonly sidebarBranding: CompanyBranding = DEFAULT_COMPANY_BRANDING;
 
@@ -47,79 +49,61 @@ export class ClientsPageComponent {
     }
   ];
 
-  /** Mocked clients dataset until the API is wired. */
-  readonly clients: PersonResponse[] = [
-    {
-      id: 1,
-      fullName: 'María García López',
-      identification: '12345678-A',
-      age: 34,
-      gender: 'FEMALE',
-      active: true,
-      drives: true,
-      wearsGlasses: false,
-      diabetic: false,
-      otherDisease: null,
-      additionalAttributes: []
-    },
-    {
-      id: 2,
-      fullName: 'Carlos Rodríguez Martín',
-      identification: '87654321-B',
-      age: 45,
-      gender: 'MALE',
-      active: true,
-      drives: true,
-      wearsGlasses: true,
-      diabetic: true,
-      otherDisease: 'Hypertension',
-      additionalAttributes: []
-    },
-    {
-      id: 3,
-      fullName: 'Ana Fernández Pérez',
-      identification: '11223344-C',
-      age: 28,
-      gender: 'FEMALE',
-      active: false,
-      drives: false,
-      wearsGlasses: true,
-      diabetic: false,
-      otherDisease: null,
-      additionalAttributes: []
-    },
-    {
-      id: 4,
-      fullName: 'Jorge Sánchez Ruiz',
-      identification: '55667788-D',
-      age: 52,
-      gender: 'MALE',
-      active: true,
-      drives: true,
-      wearsGlasses: false,
-      diabetic: false,
-      otherDisease: null,
-      additionalAttributes: []
-    },
-    {
-      id: 5,
-      fullName: 'Laura Martínez Silva',
-      identification: '99887766-E',
-      age: 39,
-      gender: 'FEMALE',
-      active: true,
-      drives: false,
-      wearsGlasses: true,
-      diabetic: false,
-      otherDisease: null,
-      additionalAttributes: []
-    }
-  ];
+  /** Clients fetched from the backend. */
+  readonly clients = signal<PersonResponse[]>([]);
+  readonly isLoading = signal<boolean>(false);
+  readonly loadError = signal<string>('');
 
   /** Controls whether the New Client modal is visible. */
   isNewClientModalOpen = false;
   modalMode: 'create' | 'edit' = 'create';
   selectedClient: PersonResponse | null = null;
+
+  private readonly personService = inject(PersonService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly document = inject(DOCUMENT);
+
+  ngOnInit(): void {
+    this.enableBodyScroll();
+    this.loadClients();
+  }
+
+  ngOnDestroy(): void {
+    this.restoreBodyScroll();
+  }
+
+  private loadClients(): void {
+    this.isLoading.set(true);
+    this.loadError.set('');
+
+    this.personService
+      .getPersons()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (clients) => {
+          this.clients.set(Array.isArray(clients) ? clients : []);
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Failed to load clients', error);
+          this.clients.set([]);
+          this.isLoading.set(false);
+          this.loadError.set('No pudimos obtener la lista de clientes. Intenta nuevamente.');
+        }
+      });
+  }
+
+  private enableBodyScroll(): void {
+    const htmlElement = this.document.documentElement;
+    htmlElement.style.overflow = 'auto';
+    this.document.body.style.overflow = 'auto';
+  }
+
+  private restoreBodyScroll(): void {
+    const htmlElement = this.document.documentElement;
+    htmlElement.style.overflow = '';
+    this.document.body.style.overflow = '';
+  }
 
   openCreateModal(): void {
     this.modalMode = 'create';

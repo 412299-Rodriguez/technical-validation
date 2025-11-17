@@ -1,19 +1,40 @@
-<div class="min-h-screen flex bg-slate-50 text-slate-900">
-  <app-sidebar class="hidden md:flex" [branding]="sidebarBranding" [links]="sidebarLinks"></app-sidebar>
+<div class="clients-layout bg-slate-50 text-slate-900">
+  <app-sidebar class="clients-layout__sidebar" [branding]="sidebarBranding" [links]="sidebarLinks"></app-sidebar>
 
-  <div class="flex-1 flex flex-col">
-    <main class="flex-1 px-8 py-6 overflow-auto">
-      <section class="mb-6">
+  <div class="clients-layout__content">
+    <main class="clients-layout__main">
+      <section class="clients-layout__header">
         <h1 class="text-2xl font-semibold text-slate-900">Clientes</h1>
         <p class="text-sm text-slate-500">Administra sus seguros de vida, datos y atributos</p>
       </section>
 
       <!-- The list notifies the parent via outputs to open the modal -->
-      <app-clients-list
-        [clients]="clients"
-        (newClient)="openCreateModal()"
-        (editClient)="openEditModal($event)">
-      </app-clients-list>
+      <ng-container *ngIf="!isLoading(); else loadingState">
+        <ng-container *ngIf="clients().length > 0; else emptyState">
+          <app-clients-list
+            [clients]="clients()"
+            (newClient)="openCreateModal()"
+            (editClient)="openEditModal($event)">
+          </app-clients-list>
+        </ng-container>
+      </ng-container>
+
+      <div *ngIf="loadError()" class="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+        {{ loadError() }}
+      </div>
+
+      <ng-template #loadingState>
+        <div class="flex h-48 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white text-sm text-slate-500">
+          Cargando clientes...
+        </div>
+      </ng-template>
+
+      <ng-template #emptyState>
+        <div class="flex h-48 flex-col items-center justify-center rounded-2xl border border-slate-100 bg-white text-center text-sm text-slate-500">
+          <p class="font-medium text-slate-600">No hay clientes registrados</p>
+          <p class="mt-1 text-xs">Usa el boton "Nuevo cliente" para comenzar.</p>
+        </div>
+      </ng-template>
     </main>
   </div>
 </div>

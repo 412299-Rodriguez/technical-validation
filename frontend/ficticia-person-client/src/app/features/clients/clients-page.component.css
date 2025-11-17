@@ -1,3 +1,36 @@
 :host {
   display: block;
+  height: 100%;
+}
+
+.clients-layout {
+  display: flex;
+  min-height: 100%;
+}
+
+.clients-layout__sidebar {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .clients-layout__sidebar {
+    display: flex;
+  }
+}
+
+.clients-layout__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.clients-layout__main {
+  flex: 1;
+  padding: 24px 32px;
+  overflow-y: auto;
+}
+
+.clients-layout__header {
+  margin-bottom: 24px;
 }
