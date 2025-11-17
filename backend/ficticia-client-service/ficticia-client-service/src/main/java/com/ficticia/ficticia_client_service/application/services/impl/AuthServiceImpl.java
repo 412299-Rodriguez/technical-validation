@@ -72,9 +72,13 @@ public class AuthServiceImpl implements AuthService {
         if (request == null) {
             throw new BusinessException("Registration data must be provided");
         }
-        userRepository.findByUsernameIgnoreCase(request.getEmail())
+        userRepository.findByUsernameIgnoreCase(request.getUsername())
                 .ifPresent(user -> {
                     throw new BusinessException("Username already in use");
+                });
+        userRepository.findByEmailIgnoreCase(request.getEmail())
+                .ifPresent(user -> {
+                    throw new BusinessException("Email already in use");
                 });
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new BusinessException("Password and confirmation must match");
@@ -82,7 +86,8 @@ public class AuthServiceImpl implements AuthService {
         RoleEntity defaultRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new BusinessException("Default role ROLE_USER not configured"));
         UserEntity user = UserEntity.builder()
-                .username(request.getEmail().toLowerCase())
+                .username(request.getUsername().toLowerCase())
+                .email(request.getEmail().toLowerCase())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .enabled(Boolean.TRUE)
                 .build();

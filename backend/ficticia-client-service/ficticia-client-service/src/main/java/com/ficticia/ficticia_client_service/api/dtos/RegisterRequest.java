@@ -21,6 +21,10 @@ public class RegisterRequest {
     private String fullName;
 
     @NotBlank
+    @Size(min = 3, max = 50)
+    private String username;
+
+    @NotBlank
     private String employeeId;
 
     @NotBlank

@@ -38,6 +38,9 @@ public class UserEntity {
     @Column(length = 50, nullable = false, unique = true)
     private String username;
 
+    @Column(length = 150, nullable = false, unique = true)
+    private String email;
+
     @Column(length = 255, nullable = false)
     private String password;
 

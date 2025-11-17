@@ -37,6 +37,7 @@ public class DataInitializer {
             userRepository.findByUsername("admin").orElseGet(() -> {
                 UserEntity admin = UserEntity.builder()
                         .username("admin")
+                        .email("admin@ficticia.com")
                         .password(passwordEncoder.encode("admin123"))
                         .enabled(true)
                         .build();

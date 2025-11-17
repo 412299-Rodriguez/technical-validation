@@ -10,6 +10,7 @@ import { FeedbackPanelComponent } from '../../../shared/components/feedback-pane
 
 type RegisterForm = FormGroup<{
   fullName: FormControl<string>;
+  username: FormControl<string>;
   employeeId: FormControl<string>;
   email: FormControl<string>;
   password: FormControl<string>;
@@ -58,6 +59,7 @@ export class RegisterComponent {
   private buildForm(): RegisterForm {
     return this.fb.nonNullable.group({
       fullName: ['', [Validators.required, Validators.maxLength(150)]],
+      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       employeeId: ['', [Validators.required, Validators.maxLength(50)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -67,6 +69,10 @@ export class RegisterComponent {
 
   get fullName() {
     return this.form.controls.fullName;
+  }
+
+  get username() {
+    return this.form.controls.username;
   }
 
   get employeeId() {
