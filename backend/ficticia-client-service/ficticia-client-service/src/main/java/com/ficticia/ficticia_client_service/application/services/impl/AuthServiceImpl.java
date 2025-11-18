@@ -183,7 +183,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(user.getEmail());
-            message.setSubject("Ficticia - Password reset instructions");
+            message.setSubject("Ficticia - Cambio de contraseña solicitado");
             message.setText(buildResetEmailBody(user.getUsername(), user.getPasswordResetToken()));
             mailSender.send(message);
         } catch (MailException exception) {
@@ -195,10 +195,10 @@ public class AuthServiceImpl implements AuthService {
     private String buildResetEmailBody(final String username, final String token) {
         String link = String.format("%s/auth/reset-password?token=%s", frontendBaseUrl, token);
         return "Hello " + username + ",\n\n"
-                + "We received a request to reset your password. Use the link below to pick a new one:\n"
+                + "Hemos recibido la petición para el cambio de clave. Ingresa en el link de abajo para cambiarla:\n"
                 + link + "\n\n"
-                + "If you did not request a password reset you can ignore this email.\n\n"
-                + "Regards,\n"
+                + "Si no has pedido el cambio de clave, ignora este mail.\n\n"
+                + "Saludos,\n"
                 + "Ficticia Security Team";
     }
 }
